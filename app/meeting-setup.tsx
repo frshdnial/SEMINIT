@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Modal, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MeetingSetup() {
   // 1. General Form Inputs & File Attachment States
@@ -73,44 +74,66 @@ export default function MeetingSetup() {
   };
 
   // State parameter payload validation
-  const handleSubmitSetup = () => {
-    if (!title.trim()) {
-      Alert.alert('Missing Title', 'Please assign a title to your meeting topic.');
+  const handleSubmitSetup = async () => {
+  if (!title.trim()) {
+    Alert.alert('Missing Title', 'Please assign a title to your meeting topic.');
+    return;
+  }
+
+  if (!audioFile) {
+    Alert.alert('Audio Stream Needed', 'Please upload an MP3 file.');
+    return;
+  }
+
+  let finalDate = '';
+  let finalStartTime = '';
+  let finalEndTime = '';
+
+  if (isManualMode) {
+    if (!manualDate.trim() || !manualStartTime.trim() || !manualEndTime.trim()) {
+      Alert.alert('Missing Fields');
       return;
     }
-    if (!audioFile) {
-      Alert.alert('Audio Stream Needed', 'Please upload an MP3 file to initialize parsing.');
+
+    finalDate = manualDate;
+    finalStartTime = manualStartTime;
+    finalEndTime = manualEndTime;
+  } else {
+    if (!calendarDateDisplay) {
+      Alert.alert('Missing Date');
       return;
     }
 
-    let finalDate = '';
-    let finalStartTime = '';
-    let finalEndTime = '';
+    finalDate = calendarDateDisplay;
+    finalStartTime = `${startHour}:${startMinute} ${startAmpm}`;
+    finalEndTime = `${endHour}:${endMinute} ${endAmpm}`;
+  }
 
-    if (isManualMode) {
-      if (!manualDate.trim() || !manualStartTime.trim() || !manualEndTime.trim()) {
-        Alert.alert('Missing Fields', 'Please complete all manual text fields before generating summaries.');
-        return;
-      }
-      finalDate = manualDate;
-      finalStartTime = manualStartTime;
-      finalEndTime = manualEndTime;
-    } else {
-      if (!calendarDateDisplay) {
-        Alert.alert('Missing Date', 'Please click the date field to select a day from the calendar.');
-        return;
-      }
-      finalDate = calendarDateDisplay;
-      finalStartTime = `${startHour}:${startMinute} ${startAmpm}`;
-      finalEndTime = `${endHour}:${endMinute} ${endAmpm}`;
-    }
-
-    Alert.alert(
-      'Form Confirmed',
-      `Session configured via ${isManualMode ? 'Manual Input' : 'Visual Calendar'} for ${finalDate} (${finalStartTime} - ${finalEndTime}).`,
-      [{ text: 'Proceed to Minutes', onPress: () => router.replace('/minutes/new-preview') }]
-    );
+  const newMeeting = {
+    id: Date.now().toString(),
+    title,
+    date: finalDate,
+    duration: `${finalStartTime} - ${finalEndTime}`,
+    location,
+    description,
   };
+
+  try {
+    const existing = await AsyncStorage.getItem('meetings');
+    const meetings = existing ? JSON.parse(existing) : [];
+
+    meetings.unshift(newMeeting);
+
+    await AsyncStorage.setItem(
+      'meetings',
+      JSON.stringify(meetings)
+    );
+
+    router.replace('/(tabs)');
+  } catch (error) {
+    Alert.alert('Error', 'Unable to save meeting.');
+  }
+};
 
   return (
     <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ padding: 24 }}>
