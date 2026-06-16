@@ -1,28 +1,29 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#800020',
-        tabBarInactiveTintColor: '#6b7280',
-        tabBarStyle: { backgroundColor: '#ffffff', borderTopWidth: 1, borderColor: '#e5e7eb' },
+        headerShown: false,
+
+        // Hide bottom tab bar
+        tabBarStyle: {
+          display: "none",
+        },
       }}
     >
-      <Tabs.Screen 
-        name="index" 
-        options={{ 
-          title: 'Dashboard',
-          headerTitle: 'Seminit Dashboard'
-        }} 
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Dashboard",
+        }}
       />
-      <Tabs.Screen 
-        name="search" 
-        options={{ 
-          title: 'Search & History',
-          headerTitle: 'Search Database'
-        }} 
+
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search & History",
+        }}
       />
     </Tabs>
   );
