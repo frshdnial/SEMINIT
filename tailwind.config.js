@@ -1,19 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./App.tsx", "./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
-  presets: [require("nativewind/preset")],
+  content: ["./App.tsx", "./src/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")], // 👈 CRITICAL: Tells Tailwind how to compile for NativeWind
   theme: {
     extend: {
       colors: {
-        // Adding your new premium identity palette
-        'royal-blue': {
-          DEFAULT: '#4169E1', // Royal Blue base
-          dark: '#1D3557',    // Deep Navy/Dark Royal for headers/banners
-        },
-        'gold': {
-          DEFAULT: '#D4AF37', // Metallic Gold accent
-          light: '#F3E5AB',   // Soft Cream Gold for subtle backgrounds
-        }
+        brandPrimary: "#1E3A8A",   // Navy Primary Accent color from designs
+        brandSuccess: "#10B981",   // Highlight Active Accent
       },
     },
   },
