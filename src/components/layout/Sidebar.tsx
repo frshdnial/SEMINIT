@@ -3,10 +3,12 @@ import { Text, TouchableOpacity, View } from 'react-native';
 
 interface SidebarProps {
   onNavigateToSetup: () => void;
+  onNavigateToList: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onNavigateToSetup,
+  onNavigateToList
 }) => {
   return (
     <View className="hidden md:flex w-64 bg-[#1E293B] p-6 justify-between border-r border-slate-800">
@@ -40,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center px-4 py-3 rounded-xl">
+          <TouchableOpacity className="flex-row items-center px-4 py-3 rounded-xl" onPress={onNavigateToList}>
             <Text className="text-slate-400 font-medium text-sm">
               Senarai Mesyuarat
             </Text>
