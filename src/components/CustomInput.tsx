@@ -8,11 +8,19 @@ interface CustomInputProps extends TextInputProps {
 export const CustomInput: React.FC<CustomInputProps> = ({ label, ...props }) => {
   return (
     <View className="mb-4 w-full">
-      <Text className="text-gray-700 text-sm font-semibold mb-1.5">{label}</Text>
+      <Text className="text-sm font-medium text-slate-700 mb-1">
+      {label}
+    </Text>
       <TextInput
-        className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:border-brandPrimary text-base"
-        placeholderTextColor="#9CA3AF"
-        {...props}
+        className="
+        h-12
+        px-4
+        bg-white
+        border
+        border-slate-300
+        rounded-xl
+        text-slate-900
+        "
       />
     </View>
   );
