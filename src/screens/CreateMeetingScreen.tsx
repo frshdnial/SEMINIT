@@ -3,6 +3,8 @@ import { Alert, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'r
 import { ActionButton } from '../components/ActionButton';
 import { CustomInput } from '../components/CustomInput';
 import { Meeting } from '../types';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Calendar } from 'lucide-react-native';
 
 interface CreateMeetingScreenProps {
   onSaveMeeting: (meeting: Meeting) => void;
@@ -15,6 +17,25 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({ onSave
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const onDateChange = (event: any, pickedDate?: Date) => {
+  setShowDatePicker(false);
+
+  if (pickedDate) {
+    setSelectedDate(pickedDate);
+
+    const formattedDate =
+      pickedDate.getFullYear() +
+      '-' +
+      String(pickedDate.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(pickedDate.getDate()).padStart(2, '0');
+
+    setDate(formattedDate);
+  }
+};
 
   const handleFormSubmission = () => {
     if (!name || !date || !startTime || !endTime) {
@@ -36,25 +57,181 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({ onSave
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <TouchableOpacity onPress={onBack} className="mb-4 py-1">
-          <Text className="text-blue-900 font-bold text-sm">← Back to Workspace</Text>
-        </TouchableOpacity>
+  <SafeAreaView className="flex-1 bg-slate-100">
+    <ScrollView contentContainerStyle={{ padding: 24 }}>
 
-        <Text className="text-2xl font-extrabold text-blue-950 mb-1">Configure Meeting Framework</Text>
-        <Text className="text-gray-500 text-xs mb-6">Initialize structural system indices before launching transcription streams.</Text>
+      <View className="max-w-5xl w-full self-center bg-white rounded-3xl border border-slate-200 overflow-hidden">
 
-        <CustomInput label="Meeting Title / Session Name" placeholder="e.g., SDD Blueprint Integration Sync" value={name} onChangeText={setName} />
-        <CustomInput label="Active Attendants & Roles" placeholder="e.g., Farish, Hafiz, Jeremy, Hurin" value={participants} onChangeText={setParticipants} />
-        <CustomInput label="Target Date Window" placeholder="YYYY-MM-DD" value={date} onChangeText={setDate} />
-        <CustomInput label="Session Target Start Time" placeholder="e.g., 14:00" value={startTime} onChangeText={setStartTime} />
-        <CustomInput label="Session Target End Time" placeholder="e.g., 15:30" value={endTime} onChangeText={setEndTime} />
+        {/* Header */}
+        <View className="px-8 py-7 bg-slate-50 border-b border-slate-200">
+          <Text className="text-3xl font-bold text-slate-900">
+            Butiran Mesyuarat
+          </Text>
 
-        <View className="mt-4">
-          <ActionButton title="Save & Process Audio Upload" onPress={handleFormSubmission} />
+          <Text className="text-slate-500 mt-2">
+            Masukkan maklumat asas untuk mesyuarat baharu ini.
+          </Text>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+
+        {/* Body */}
+        <View className="p-8">
+
+          {/* Tajuk */}
+          <CustomInput
+            label="Tajuk Mesyuarat *"
+            placeholder="Contoh: Mesyuarat Penuh Majlis Bil. 4/2026"
+            value={name}
+            onChangeText={setName}
+          />
+
+          {/* Row */}
+          <View className="flex-row gap-6 mt-6">
+
+            <View className="flex-1">
+
+  <Text className="text-sm font-medium text-slate-700 mb-2">
+    Tarikh *
+  </Text>
+
+  <TouchableOpacity
+  onPress={() => setShowDatePicker(true)}
+  className="
+    h-12
+    px-4
+    border
+    border-slate-300
+    rounded-xl
+    bg-white
+    flex-row
+    items-center
+  "
+>
+  <Calendar
+    size={18}
+    color="#64748B"
+  />
+
+  <Text
+    className={`ml-3 ${
+      date ? 'text-slate-900' : 'text-slate-400'
+    }`}
+  >
+    {date || 'Pilih tarikh'}
+  </Text>
+</TouchableOpacity>
+
+  {showDatePicker && (
+    <DateTimePicker
+      value={selectedDate}
+      mode="date"
+      display="default"
+      onChange={onDateChange}
+    />
+  )}
+
+</View>
+
+            <View className="flex-1">
+              <CustomInput
+                label="Lokasi *"
+                placeholder="Bilik Mesyuarat Utama"
+                value={participants}
+                onChangeText={setParticipants}
+              />
+            </View>
+
+          </View>
+
+          {/* Participants */}
+          <View className="mt-6">
+
+            <Text className="text-sm font-medium text-slate-700 mb-2">
+              Senarai Peserta *
+            </Text>
+
+            <View className="flex-row gap-3">
+
+              <View className="flex-1">
+                <CustomInput
+                  label=""
+                  placeholder="Nama / Jawatan (Tekan Enter)"
+                  value={participants}
+                  onChangeText={setParticipants}
+                />
+              </View>
+
+              <TouchableOpacity
+                className="h-12 px-6 bg-amber-500 rounded-xl justify-center"
+              >
+                <Text className="font-medium text-black">
+                  Tambah
+                </Text>
+              </TouchableOpacity>
+
+            </View>
+          </View>
+
+          {/* Agenda */}
+          <View className="mt-6">
+
+            <Text className="text-sm font-medium text-slate-700 mb-2">
+              Agenda Mesyuarat *
+            </Text>
+
+            <View className="flex-row gap-3">
+
+              <View className="flex-1">
+                <CustomInput
+                  label=""
+                  placeholder="Perkara agenda (Tekan Enter)"
+                  value=""
+                  onChangeText={() => {}}
+                />
+              </View>
+
+              <TouchableOpacity
+                className="h-12 px-6 bg-amber-500 rounded-xl justify-center"
+              >
+                <Text className="font-medium text-black">
+                  Tambah
+                </Text>
+              </TouchableOpacity>
+
+            </View>
+          </View>
+
+        </View>
+
+        {/* Footer */}
+        <View className="px-8 py-6 border-t border-slate-200 bg-slate-50">
+
+          <View className="flex-row justify-end gap-4">
+
+            <TouchableOpacity
+              onPress={onBack}
+              className="px-6 py-3 rounded-xl border border-slate-300 bg-white"
+            >
+              <Text className="font-medium text-slate-700">
+                Batal
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleFormSubmission}
+              className="px-8 py-3 rounded-xl bg-[#1E3A78]"
+            >
+              <Text className="font-semibold text-white">
+                Simpan & Teruskan
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+        </View>
+
+      </View>
+
+    </ScrollView>
+  </SafeAreaView>
+);
 };

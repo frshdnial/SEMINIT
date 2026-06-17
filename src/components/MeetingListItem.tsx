@@ -11,10 +11,18 @@ export const MeetingListItem: React.FC<MeetingListItemProps> = ({ meeting, onPre
   const isDone = meeting.status === 'Completed';
 
   return (
-    <TouchableOpacity 
-      className="bg-white p-4 rounded-xl mb-3 border border-gray-200 shadow-sm flex-col"
-      onPress={onPress}
-      activeOpacity={0.7}
+    <TouchableOpacity
+      className="
+        flex-row
+        justify-between
+        items-center
+        p-4
+        mb-3
+        border
+        border-slate-200
+        rounded-xl
+        bg-white
+      "
     >
       <View className="flex-row justify-between items-center mb-2">
         <Text className="text-lg font-bold text-blue-950 flex-1 mr-2" numberOfLines={1}>
