@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View } from 'react-native';
 import "./global.css"; // 👈 CRITICAL: Imports global styles for NativeWind v4 Web/Mobile engines
 
@@ -7,10 +7,11 @@ import "./global.css"; // 👈 CRITICAL: Imports global styles for NativeWind v4
 import { AudioUploadScreen } from '@/screens/AudioUploadScreen';
 import { CreateMeetingScreen } from '@/screens/CreateMeetingScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
+import { MeetingListScreen } from '@/screens/MeetingListScreen';
 import { ViewMinutesScreen } from '@/screens/ViewMinutesScreen';
 import { Meeting } from '@/types';
 
-type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'MINUTES';
+type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'MINUTES' | 'LIST';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('DASHBOARD');
@@ -30,7 +31,7 @@ export default function App() {
       }
       return item;
     });
-    
+
     setMeetings(modifications);
     const targetElement = modifications.find((item: Meeting) => item.id === id);
     if (targetElement) {
@@ -51,24 +52,25 @@ export default function App() {
   return (
     <View className="flex-1 bg-gray-50">
       <StatusBar style="dark" />
-      
+
       {currentScreen === 'DASHBOARD' && (
-        <DashboardScreen 
+        <DashboardScreen
           meetings={meetings}
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
+          onNavigateToList={() => setCurrentScreen('LIST')}
           onSelectMeeting={handleSelectMeetingEntry}
         />
       )}
 
       {currentScreen === 'CREATE' && (
-        <CreateMeetingScreen 
+        <CreateMeetingScreen
           onSaveMeeting={handleCreateMeetingComplete}
           onBack={() => setCurrentScreen('DASHBOARD')}
         />
       )}
 
       {currentScreen === 'UPLOAD' && activeSelectedMeeting && (
-        <AudioUploadScreen 
+        <AudioUploadScreen
           meeting={activeSelectedMeeting}
           onAudioProcessed={handleAudioProcessingComplete}
           onBack={() => setCurrentScreen('DASHBOARD')}
@@ -76,9 +78,17 @@ export default function App() {
       )}
 
       {currentScreen === 'MINUTES' && activeSelectedMeeting && (
-        <ViewMinutesScreen 
+        <ViewMinutesScreen
           meeting={activeSelectedMeeting}
           onBack={() => setCurrentScreen('DASHBOARD')}
+        />
+      )}
+
+      {currentScreen === 'LIST' && (
+        <MeetingListScreen
+          meetings={meetings}
+          onBack={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToSetup={() => setCurrentScreen('CREATE')}
         />
       )}
     </View>

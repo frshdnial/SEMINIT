@@ -12,12 +12,14 @@ import { Meeting } from '../types';
 interface DashboardScreenProps {
   meetings: Meeting[];
   onNavigateToSetup: () => void;
+  onNavigateToList: () => void;
   onSelectMeeting: (meeting: Meeting) => void;
 }
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   meetings,
   onNavigateToSetup,
+  onNavigateToList,
   onSelectMeeting,
 }) => {
   const totalMeetings = meetings.length;
@@ -33,7 +35,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   ).length;
 
   return (
-    <AppLayout onNavigateToSetup={onNavigateToSetup}>
+    <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={onNavigateToList}>
       <PageContainer>
         {/* Header */}
 
@@ -128,7 +130,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                 </View>
 
                 <TouchableOpacity className="px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200">
-                  <Text className="text-xs font-semibold text-slate-600">
+                  <Text className="text-xs font-semibold text-slate-600" onPress={onNavigateToList}>
                     Lihat Semua
                   </Text>
                 </TouchableOpacity>
