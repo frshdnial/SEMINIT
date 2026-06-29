@@ -30,12 +30,60 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
     size: string;
   } | null>(null);
 
+  const [recording, setRecording] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [recorded, setRecorded] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+
   const [nlpEvaluating, setNlpEvaluating] = useState(false);
 
   const triggerMockFileSelection = () => {
     setAttachedFile({
       name: 'rekod_mesyuarat_bantuan_kulai.mp3',
       size: '34.2 MB',
+    });
+  };
+
+  const startRecording = () => {
+    setRecording(true);
+    setPaused(false);
+    setRecorded(false);
+    setRecordingTime(0);
+
+    const timer = setInterval(() => {
+      setRecordingTime((prev) => prev + 1);
+    }, 1000);
+
+    (global as any).recordingTimer = timer;
+  };
+
+  const pauseRecording = () => {
+    clearInterval((global as any).recordingTimer);
+    setPaused(true);
+    setRecording(false);
+  };
+
+  const resumeRecording = () => {
+    setPaused(false);
+    setRecording(true);
+
+    const timer = setInterval(() => {
+      setRecordingTime((prev) => prev + 1);
+    }, 1000);
+
+    (global as any).recordingTimer = timer;
+  };
+
+  const stopRecording = () => {
+    clearInterval((global as any).recordingTimer);
+
+    setRecording(false);
+    setPaused(false);
+    setRecorded(true);
+
+    setAttachedFile({
+      name: "meeting_recording.wav",
+      size: "Recorded Audio",
     });
   };
 
@@ -113,6 +161,90 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
           </Text>
         </TouchableOpacity>
 
+        <View className="my-6">
+
+        <Text className="text-center font-bold text-slate-400 mb-4">
+          ─────── OR ───────
+        </Text>
+
+        <Panel>
+
+          <Text className="text-lg font-bold mb-4">
+            🎙 Record Audio
+          </Text>
+
+          <Text className="text-center text-4xl font-bold mb-4">
+            {new Date(recordingTime * 1000).toISOString().substr(14,5)}
+          </Text>
+
+          {!recording && !paused && !recorded && (
+            <TouchableOpacity
+              className="bg-red-600 rounded-xl p-4 items-center"
+              onPress={startRecording}
+            >
+              <Text className="text-white font-bold">
+                🔴 Start Recording
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {recording && (
+            <View className="flex-row justify-center">
+
+              <TouchableOpacity
+                className="bg-yellow-500 rounded-xl px-6 py-3 mr-3"
+                onPress={pauseRecording}
+              >
+                <Text className="text-white font-bold">
+                  ⏸ Pause
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                className="bg-red-600 rounded-xl px-6 py-3"
+                onPress={stopRecording}
+              >
+                <Text className="text-white font-bold">
+                  ⏹ Stop
+                </Text>
+              </TouchableOpacity>
+
+            </View>
+          )}
+
+          {paused && (
+            <View className="flex-row justify-center">
+
+              <TouchableOpacity
+                className="bg-blue-600 rounded-xl px-6 py-3 mr-3"
+                onPress={resumeRecording}
+              >
+                <Text className="text-white font-bold">
+                  ▶ Resume
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                className="bg-red-600 rounded-xl px-6 py-3"
+                onPress={stopRecording}
+              >
+                <Text className="text-white font-bold">
+                  ⏹ Stop
+                </Text>
+              </TouchableOpacity>
+
+            </View>
+          )}
+
+          {recorded && (
+            <Text className="text-center text-green-600 font-bold mt-4">
+              ✓ Recording Saved
+            </Text>
+          )}
+
+        </Panel>
+
+      </View>
         {nlpEvaluating && (
           <View className="bg-blue-50 p-4 rounded-xl items-center mt-4 border border-blue-100">
             <ActivityIndicator size="small" color="#1E3A8A" />
