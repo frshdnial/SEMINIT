@@ -1,6 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
-
+import { View, ScrollView } from 'react-native';
 import { Sidebar } from './Sidebar';
 
 interface AppLayoutProps {
@@ -15,16 +14,19 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onNavigateToList,
 }) => {
   return (
-    <View className="flex-1 flex-col md:flex-row bg-[#F8FAFC]">
-      <Sidebar
-        onNavigateToSetup={onNavigateToSetup}
-        onNavigateToList={onNavigateToList}
-      />
-
-      {/* This is the missing piece */}
-      <View className="flex-1 w-full">
-        {children}
+    <View className="flex-1 flex-col md:flex-row bg-[#F8FAFC] h-full">
+      {/* Sidebar should stretch full height */}
+      <View className="h-full">
+        <Sidebar
+          onNavigateToSetup={onNavigateToSetup}
+          onNavigateToList={onNavigateToList}
+        />
       </View>
+
+      {/* Content area should scroll */}
+      <ScrollView className="flex-1 w-full">
+        {children}
+      </ScrollView>
     </View>
   );
 };
