@@ -34,6 +34,9 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
   const [paused, setPaused] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [audioMethod, setAudioMethod] = useState<
+    "NONE" | "UPLOAD" | "RECORD"
+  >("NONE");
 
   const [nlpEvaluating, setNlpEvaluating] = useState(false);
 
@@ -146,127 +149,233 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
       </View>
 
       {/* Upload Panel */}
-      <Panel>
-        <TouchableOpacity
-          onPress={triggerMockFileSelection}
-          className="border-2 border-dashed border-slate-300 rounded-2xl p-10 items-center justify-center bg-slate-50"
-          activeOpacity={0.8}
-        >
-          <Text className="text-4xl mb-3">🎵</Text>
-          <Text className="text-slate-800 font-bold text-base">
-            {attachedFile ? attachedFile.name : 'Klik Untuk Pilih Fail Rekod Audio (.mp3)'}
-          </Text>
-          <Text className="text-slate-400 text-xs mt-1">
-            {attachedFile ? attachedFile.size : 'Format yang disokong: .mp3, .wav, .m4a'}
-          </Text>
-        </TouchableOpacity>
-
-        <View className="my-6">
-
-        <Text className="text-center font-bold text-slate-400 mb-4">
-          ─────── OR ───────
-        </Text>
-
         <Panel>
 
-          <Text className="text-lg font-bold mb-4">
-            🎙 Record Audio
-          </Text>
+          {/* ================= CHOOSE METHOD ================= */}
 
-          <Text className="text-center text-4xl font-bold mb-4">
-            {new Date(recordingTime * 1000).toISOString().substr(14,5)}
-          </Text>
+          {audioMethod === "NONE" && (
+            <View>
 
-          {!recording && !paused && !recorded && (
-            <TouchableOpacity
-              className="bg-red-600 rounded-xl p-4 items-center"
-              onPress={startRecording}
-            >
-              <Text className="text-white font-bold">
-                🔴 Start Recording
+              <Text className="text-lg font-bold text-center text-slate-800 mb-6">
+                Pilih Kaedah Audio
               </Text>
-            </TouchableOpacity>
-          )}
-
-          {recording && (
-            <View className="flex-row justify-center">
 
               <TouchableOpacity
-                className="bg-yellow-500 rounded-xl px-6 py-3 mr-3"
-                onPress={pauseRecording}
+                onPress={() => setAudioMethod("UPLOAD")}
+                className="bg-blue-900 rounded-2xl p-6 items-center mb-4"
               >
-                <Text className="text-white font-bold">
-                  ⏸ Pause
+                <Text className="text-5xl mb-2">🎵</Text>
+
+                <Text className="text-white font-bold text-lg">
+                  Muat Naik Audio
+                </Text>
+
+                <Text className="text-blue-100 text-sm mt-1">
+                  Pilih fail audio daripada peranti
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="bg-red-600 rounded-xl px-6 py-3"
-                onPress={stopRecording}
+                onPress={() => setAudioMethod("RECORD")}
+                className="bg-red-600 rounded-2xl p-6 items-center"
               >
-                <Text className="text-white font-bold">
-                  ⏹ Stop
+                <Text className="text-5xl mb-2">🎙</Text>
+
+                <Text className="text-white font-bold text-lg">
+                  Rakam Audio
                 </Text>
-              </TouchableOpacity>
 
-            </View>
-          )}
-
-          {paused && (
-            <View className="flex-row justify-center">
-
-              <TouchableOpacity
-                className="bg-blue-600 rounded-xl px-6 py-3 mr-3"
-                onPress={resumeRecording}
-              >
-                <Text className="text-white font-bold">
-                  ▶ Resume
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                className="bg-red-600 rounded-xl px-6 py-3"
-                onPress={stopRecording}
-              >
-                <Text className="text-white font-bold">
-                  ⏹ Stop
+                <Text className="text-red-100 text-sm mt-1">
+                  Rakam mesyuarat secara langsung
                 </Text>
               </TouchableOpacity>
 
             </View>
           )}
 
-          {recorded && (
-            <Text className="text-center text-green-600 font-bold mt-4">
-              ✓ Recording Saved
-            </Text>
+          {/* ================= UPLOAD ================= */}
+
+          {audioMethod === "UPLOAD" && (
+            <>
+
+              <TouchableOpacity
+                onPress={triggerMockFileSelection}
+                className="border-2 border-dashed border-slate-300 rounded-2xl p-10 items-center justify-center bg-slate-50"
+              >
+                <Text className="text-4xl mb-3">🎵</Text>
+
+                <Text className="text-slate-800 font-bold text-base">
+                  {attachedFile
+                    ? attachedFile.name
+                    : "Klik Untuk Pilih Fail Rekod Audio (.mp3)"}
+                </Text>
+
+                <Text className="text-slate-400 text-xs mt-1">
+                  {attachedFile
+                    ? attachedFile.size
+                    : "Format: .mp3 .wav .m4a"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setAudioMethod("NONE");
+                  setAttachedFile(null);
+                }}
+                className="mt-4 items-center"
+              >
+                <Text className="text-blue-900 font-bold">
+                  ← Pilih Kaedah Lain
+                </Text>
+              </TouchableOpacity>
+
+            </>
+          )}
+
+          {/* ================= RECORD ================= */}
+
+          {audioMethod === "RECORD" && (
+            <>
+
+              <View className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+
+                <Text className="text-lg font-bold mb-4">
+                  🎙 Record Audio
+                </Text>
+
+                <Text className="text-center text-4xl font-bold mb-6">
+                  {new Date(recordingTime * 1000)
+                    .toISOString()
+                    .substr(14,5)}
+                </Text>
+
+                {!recording && !paused && !recorded && (
+
+                  <TouchableOpacity
+                    className="bg-red-600 rounded-xl py-4 items-center"
+                    onPress={startRecording}
+                  >
+                    <Text className="text-white font-bold">
+                      🔴 Start Recording
+                    </Text>
+                  </TouchableOpacity>
+
+                )}
+
+                {recording && (
+
+                  <View className="flex-row justify-center">
+
+                    <TouchableOpacity
+                      className="bg-yellow-500 rounded-xl px-6 py-3 mr-3"
+                      onPress={pauseRecording}
+                    >
+                      <Text className="text-white font-bold">
+                        ⏸ Pause
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      className="bg-red-600 rounded-xl px-6 py-3"
+                      onPress={stopRecording}
+                    >
+                      <Text className="text-white font-bold">
+                        ⏹ Stop
+                      </Text>
+                    </TouchableOpacity>
+
+                  </View>
+
+                )}
+
+                {paused && (
+
+                  <View className="flex-row justify-center">
+
+                    <TouchableOpacity
+                      className="bg-blue-600 rounded-xl px-6 py-3 mr-3"
+                      onPress={resumeRecording}
+                    >
+                      <Text className="text-white font-bold">
+                        ▶ Resume
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      className="bg-red-600 rounded-xl px-6 py-3"
+                      onPress={stopRecording}
+                    >
+                      <Text className="text-white font-bold">
+                        ⏹ Stop
+                      </Text>
+                    </TouchableOpacity>
+
+                  </View>
+
+                )}
+
+                {recorded && (
+                  <Text className="text-green-600 text-center font-bold mt-4">
+                    ✅ Recording Saved
+                  </Text>
+                )}
+
+              </View>
+
+              <TouchableOpacity
+                onPress={() => {
+
+                  setAudioMethod("NONE");
+                  setRecording(false);
+                  setPaused(false);
+                  setRecorded(false);
+                  setRecordingTime(0);
+
+                }}
+                className="mt-4 items-center"
+              >
+                <Text className="text-blue-900 font-bold">
+                  ← Pilih Kaedah Lain
+                </Text>
+              </TouchableOpacity>
+
+            </>
+          )}
+
+          {/* ================= PROCESS ================= */}
+
+          {audioMethod !== "NONE" && nlpEvaluating && (
+
+            <View className="bg-blue-50 p-4 rounded-xl items-center mt-4 border border-blue-100">
+
+              <ActivityIndicator size="small" color="#1E3A8A"/>
+
+              <Text className="text-blue-950 font-semibold text-xs mt-2 text-center">
+                Menjana Transkripsi & Minit Mesyuarat Pintar (AI)...
+              </Text>
+
+            </View>
+
+          )}
+
+          {audioMethod !== "NONE" && !nlpEvaluating && (
+
+            <View className="mt-6">
+
+              <TouchableOpacity
+                onPress={executeNlpEvaluationPipeline}
+                className="w-full h-12 bg-emerald-600 rounded-xl items-center justify-center"
+              >
+                <Text className="text-white font-bold">
+                  Proses Rekod Audio Pintar
+                </Text>
+              </TouchableOpacity>
+
+            </View>
+
           )}
 
         </Panel>
-
-      </View>
-        {nlpEvaluating && (
-          <View className="bg-blue-50 p-4 rounded-xl items-center mt-4 border border-blue-100">
-            <ActivityIndicator size="small" color="#1E3A8A" />
-            <Text className="text-blue-950 font-semibold text-xs text-center mt-2">
-              Menjana Transkripsi & Minit Mesyuarat Pintar (AI)...
-            </Text>
-          </View>
-        )}
-
-        {!nlpEvaluating && (
-          <View className="mt-6">
-            <TouchableOpacity 
-              onPress={executeNlpEvaluationPipeline}
-              className="w-full h-12 bg-emerald-600 rounded-xl items-center justify-center shadow-sm active:bg-emerald-700"
-            >
-              <Text className="text-white font-bold text-sm">
-                Proses Rekod Audio Pintar
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Panel>
     </PageContainer>
   );
 };
