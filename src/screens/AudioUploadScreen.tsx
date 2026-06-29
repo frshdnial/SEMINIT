@@ -34,36 +34,48 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
 
   const triggerMockFileSelection = () => {
     setAttachedFile({
-      name: 'rekod_mesyuarat_pentadbiran.mp3',
-      size: '18.4 MB',
+      name: 'rekod_mesyuarat_bantuan_kulai.mp3',
+      size: '34.2 MB',
     });
   };
 
   const executeNlpEvaluationPipeline = () => {
-    // Force set mock file to bypass any validation blocks
     setAttachedFile({
-      name: 'rekod_mesyuarat_pentadbiran.mp3',
-      size: '18.4 MB',
+      name: 'rekod_mesyuarat_bantuan_kulai.mp3',
+      size: '34.2 MB',
     });
 
     setNlpEvaluating(true);
 
-    // Short processing delay for prototype feel
+    // Fast simulation layout transition delay (1.2 seconds)
     setTimeout(() => {
       setNlpEvaluating(false);
 
+      // Longer, realistic conversation transcript focusing on Bantuan Kewangan Daerah Kulai
       const generatedTranscript =
-        "[00:12] Pengerusi: Assalamualaikum, mari kita mulakan perbincangan reka bentuk sistem Seminit.\n" +
-        "[00:55] Hafiz: Integrasi framework Tailwind CSS versi web dan mobile kini berjalan lancar.\n" +
-        "[01:40] Jeremy: Pautan mockup data flow skrin sedia dipadankan mengikut state aplikasi.";
+        "[00:05] Pengerusi: Assalamualaikum dan selamat pagi semua. Agenda utama perbincangan kita hari ini adalah untuk memperhalusi pelancaran program Bantuan Kewangan Daerah Kulai bagi fasa kedua tahun ini. Kita perlu pastikan dana diagihkan dengan adil kepada golongan sasar.\n\n" +
+        "[00:45] Puan Aminah (Kebajikan): Terima kasih Tuan Pengerusi. Berdasarkan data kemas kini, kami telah mengenalpasti seramai 1,200 ketua isi rumah di sekitar mukim Kulai, Senai, dan Kelapa Sawit yang layak menerima skim bantuan kecemasan sara hidup ini. Isu utama sekarang adalah kaedah pengagihan bagi mengelakkan kesesakan.\n\n" +
+        "[01:30] Encik Hafiz (Kewangan): Menyentuh tentang dana, peruntukan keseluruhan yang telah diluluskan adalah sebanyak RM500,000. Setiap keluarga yang terpilih akan menerima bantuan sekali beri (one-off) bernilai RM400. Pihak kami mencadangkan pemindahan elektronik terus ke akaun bank penerima untuk mempercepatkan proses.\n\n" +
+        "[02:15] Pengerusi: Pilihan pemindahan terus elektronik itu sangat bagus Encik Hafiz. Namun, bagaimana pula dengan komuniti warga emas atau penduduk pedalaman yang tiada akses perbankan digital aktif?\n\n" +
+        "[02:40] Puan Aminah (Kebajikan): Untuk kes khas seperti itu, pasukan sukarelawan kami akan turun padang ke dewan parlimen daerah masing-masing pada hujung minggu depan bagi menyerahkan tunai secara terus beserta baucar barangan asas.\n\n" +
+        "[03:10] Encik Hafiz (Kewangan): Setuju. Seterusnya, kita perlukan tarikh akhir pendaftaran dokumen sokongan. Saya cadangkan tarikh tutup adalah pada hari Jumaat ini jam 5 petang bagi memberi ruang audit akaun diselesaikan awal bulan depan.\n\n" +
+        "[03:45] Pengerusi: Baik, cadangan diterima. Pastikan hebahan di media sosial, papan kenyataan awam, dan melalui ketua-ketua kampung dilakukan secara menyeluruh bermula petang ini. Terima kasih semua.";
 
+      // Informative, logical structured Executive Summary
       const generatedSummary =
-        "Rumusan Eksekutif Pentadbiran:\n" +
-        "• Keputusan Utama: Reka bentuk skrin berprestasi tinggi disahkan menggunakan layout TypeScript.\n" +
-        "• Tindakan Susulan:\n" +
-        "  - Memastikan parameter routing dipadankan ke komponen AudioUploadScreen.";
+        "RUMUSAN EKSEKUTIF: PROGRAM BANTUAN KEWANGAN DAERAH KULAI\n\n" +
+        "1. OBJEKTIF & DANA PERUNTUKAN\n" +
+        "• Meluluskan agihan dana berjumlah RM500,000 untuk Fasa Kedua bagi meringankan kos sara hidup penduduk yang terkesan di Daerah Kulai.\n" +
+        "• Skop geografi utama agihan merangkumi Mukim Kulai, Mukim Senai, dan Kawasan Kelapa Sawit.\n\n" +
+        "2. KAEDAH & STRUKTUR AGIHAN\n" +
+        "• Seramai 1,200 ketua isi rumah (KIR) telah disahkan layak melalui tapisan data Jabatan Kebajikan.\n" +
+        "• Nilai bantuan ditetapkan sebanyak RM400 per keluarga secara sekali beri (one-off).\n" +
+        "• Saluran agihan utama menggunakan pindahan akaun bank secara terus (EFT) untuk mempercepat urusan.\n" +
+        "• Agihan tunai secara fizikal dan penyerahan baucar keperluan makanan asas akan dilaksanakan khas untuk warga emas tanpa akaun bank di dewan parlimen tempatan.\n\n" +
+        "3. PELAN TINDAKAN & TARIKH AKHIR\n" +
+        "• Tarikh Tutup Pendaftaran: Hari Jumaat ini, jam 5.00 petang bagi membolehkan audit akaun segera dilakukan.\n" +
+        "• Publisiti Awam: Menggerakkan ketua kampung dan mengoptimumkan media sosial rasmi pejabat daerah bermula petang ini untuk hebahan meluas.";
 
-      // Send clean data directly back up to App.tsx
       onAudioProcessed(meeting.id, generatedTranscript, generatedSummary);
     }, 1200);
   };
@@ -112,7 +124,6 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
 
         {!nlpEvaluating && (
           <View className="mt-6">
-            {/* Standard React Native button replaces custom wrapper action buttons */}
             <TouchableOpacity 
               onPress={executeNlpEvaluationPipeline}
               className="w-full h-12 bg-emerald-600 rounded-xl items-center justify-center shadow-sm active:bg-emerald-700"
