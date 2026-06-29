@@ -28,7 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Sistem Minit AI
             </Text>
             <Text className="text-slate-400 text-xxs font-medium uppercase tracking-tight">
-              Majlis Daerah Kulai
+              Pejabat Daerah Kulai
             </Text>
           </View>
         </View>
