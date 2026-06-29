@@ -7,24 +7,28 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 final class MeetingReportControllers
 {
+    //container for storing database repository
     public function __construct(private MeetingReportRepository $reports)
     {
     }
 
+    //for GET request
     public function index(Request $req, Response $res): Response
     {
         $p = $req->getQueryParams();
-        $rows = $this->reports->all((string) ($p['q'] ?? ''), (int) ($p['limit'] ?? 0));
-        return $this->json($res, ['count' => count($rows), 'data' => $rows]);
+        $rows = $this->reports->all((string) ($p['q'] ?? ''), (int) ($p['limit'] ?? 0));//calls all() method for database search
+        return $this->json($res, ['count' => count($rows), 'data' => $rows]);//return the total count and report data list
     }
 
+    //fetching single report
     public function show(Request $req, Response $res, array $a): Response
     {
         $report = $this->reports->find((int) $a['id']);
-        return $report ? $this->json($res, $report)
+        return $report ? $this->json($res, $report)//finds the report by id
             : $this->json($res, ['error' => 'Meeting report not found'], 404);
     }
 
+    //create new report
     public function create(Request $req, Response $res): Response
     {
         $body = (array) ($req->getParsedBody() ?? []);
@@ -46,6 +50,7 @@ final class MeetingReportControllers
         )->withHeader('Location', '/api/reports/' . $id);
     }
 
+    //update report
     public function update(Request $req, Response $res, array $args): Response
     {
         $id = (int) ($args['id'] ?? 0);
@@ -68,6 +73,7 @@ final class MeetingReportControllers
         return $this->json($res, ['message' => 'Meeting report updated', 'data' => $updatedReport]);
     }
 
+    //delete report
     public function delete(Request $req, Response $res, array $args): Response
     {
         $id = (int) ($args['id'] ?? 0);
@@ -81,6 +87,7 @@ final class MeetingReportControllers
         return $this->json($res, ['message' => 'Meeting report deleted', 'data' => $deleted]);
     }
 
+    //validate report
     private function validate(array $b, bool $requireAll): array
     {
         $errors = [];
