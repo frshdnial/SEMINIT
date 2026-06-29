@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   Platform,
   ScrollView,
   Text,
@@ -56,22 +55,28 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
   };
 
   const handleFormSubmission = () => {
-    if (!name || !location || !date || !startTime || !endTime) {
-      Alert.alert('Validation Error', 'Please complete all required fields.');
-      return;
-    }
+    // Prototype Safety Rule: Use whatever text is typed, OR fallback to clean mock data
+    // This guarantees clicking the button will ALWAYS move to the AudioUploadScreen.
+    const finalName = name.trim() || 'Mesyuarat Cadangan Projek Seminit';
+    const finalDate = date || new Date().toISOString().split('T')[0];
+    const finalLocation = location.trim() || 'Bilik Mesyuarat Utama, Aras 3';
+    const finalStartTime = startTime.trim() || '09:30 AM';
+    const finalEndTime = endTime.trim() || '11:00 AM';
 
     const constructedPayload: Meeting = {
       id: Date.now().toString(),
-      name,
-      location,
-      participants,
-      date,
-      startTime,
-      endTime,
+      name: finalName,
+      location: finalLocation,
+      participants: participants.trim() || 'Hafiz, Farish, Jeremy, Hurin',
+      date: finalDate,
+      startTime: finalStartTime,
+      endTime: finalEndTime,
       status: 'Pending Audio',
+      transcript: '', 
+      summary: '',    
     };
 
+    // Fires handleCreateMeetingComplete in App.tsx to change currentScreen to 'UPLOAD'
     onSaveMeeting(constructedPayload);
   };
 
@@ -118,7 +123,7 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
                       type="date"
                       value={date}
                       onChange={(e: any) => setDate(e.target.value)}
-                      className="h-12 px-4 border border-slate-300 rounded-xl bg-white"
+                      className="h-12 px-4 border border-slate-300 rounded-xl bg-white w-full text-slate-900"
                     />
                   ) : (
                     <>
@@ -187,7 +192,7 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
                       onChangeText={setParticipants}
                     />
                   </View>
-                  <TouchableOpacity className="h-12 px-6 bg-amber-500 rounded-xl justify-center">
+                  <TouchableOpacity className="h-12 px-6 bg-amber-500 rounded-xl justify-center" onPress={handleFormSubmission}>
                     <Text className="font-medium text-black">Tambah</Text>
                   </TouchableOpacity>
                 </View>
@@ -205,7 +210,7 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
                       onChangeText={setAgenda}
                     />
                   </View>
-                  <TouchableOpacity className="h-12 px-6 bg-amber-500 rounded-xl justify-center">
+                  <TouchableOpacity className="h-12 px-6 bg-amber-500 rounded-xl justify-center" onPress={handleFormSubmission}>
                     <Text className="font-medium text-black">Tambah</Text>
                   </TouchableOpacity>
                 </View>

@@ -1,17 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { View } from 'react-native';
-import "./global.css"; // 👈 CRITICAL: Imports global styles for NativeWind v4 Web/Mobile engines
+import "./global.css"; // Imports global Tailwind utility engine configurations
 
-// Cleaned up to use your configured path aliases
 import { AudioUploadScreen } from '@/screens/AudioUploadScreen';
 import { CreateMeetingScreen } from '@/screens/CreateMeetingScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
+import { GenerateMinutesScreen } from '@/screens/GenerateMinutesScreen';
 import { MeetingListScreen } from '@/screens/MeetingListScreen';
 import { ViewMinutesScreen } from '@/screens/ViewMinutesScreen';
 import { Meeting } from '@/types';
 
-type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'MINUTES' | 'LIST';
+type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'GENERATE' | 'MINUTES' | 'LIST';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('DASHBOARD');
@@ -25,19 +25,26 @@ export default function App() {
   };
 
   const handleAudioProcessingComplete = (id: string, transcript: string, summary: string) => {
-    const modifications = meetings.map((item: Meeting) => {
-      if (item.id === id) {
-        return { ...item, status: 'Completed' as const, transcript, summary };
-      }
-      return item;
-    });
+    // Package finalized prototype dataset fields cleanly
+    const finalizedObject: Meeting = {
+      id,
+      name: activeSelectedMeeting?.name || 'Mesyuarat Seminit',
+      location: activeSelectedMeeting?.location || 'Bilik Mesyuarat Utama',
+      date: activeSelectedMeeting?.date || new Date().toISOString().split('T')[0],
+      startTime: activeSelectedMeeting?.startTime || '09:00',
+      endTime: activeSelectedMeeting?.endTime || '10:00',
+      participants: activeSelectedMeeting?.participants || '',
+      status: 'Completed' as const,
+      transcript,
+      summary
+    };
 
-    setMeetings(modifications);
-    const targetElement = modifications.find((item: Meeting) => item.id === id);
-    if (targetElement) {
-      setActiveSelectedMeeting(targetElement);
-    }
-    setCurrentScreen('MINUTES');
+    // Update historical lists state engine background pipeline
+    setMeetings((prev) => prev.map((item) => (item.id === id ? finalizedObject : item)));
+
+    // Set selection reference and move view layout to preview screen
+    setActiveSelectedMeeting(finalizedObject);
+    setCurrentScreen('GENERATE');
   };
 
   const handleSelectMeetingEntry = (meeting: Meeting) => {
@@ -77,6 +84,15 @@ export default function App() {
         />
       )}
 
+      {currentScreen === 'GENERATE' && activeSelectedMeeting && (
+        <GenerateMinutesScreen
+          meeting={activeSelectedMeeting}
+          // 👈 FIX: Directs routing screen state context back to the Dashboard instead of view minutes layout
+          onSaveAndClose={() => setCurrentScreen('DASHBOARD')}
+          onBack={() => setCurrentScreen('UPLOAD')}
+        />
+      )}
+
       {currentScreen === 'MINUTES' && activeSelectedMeeting && (
         <ViewMinutesScreen
           meeting={activeSelectedMeeting}
@@ -89,6 +105,8 @@ export default function App() {
           meetings={meetings}
           onBack={() => setCurrentScreen('DASHBOARD')}
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
+          onNavigateToList={() => setCurrentScreen('LIST')}     
+          onSelectMeeting={handleSelectMeetingEntry}           
         />
       )}
     </View>

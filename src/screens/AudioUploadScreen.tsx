@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-import { ActionButton } from '../components/ActionButton';
 import { PageContainer } from '../components/ui/PageContainer';
 import { Panel } from '../components/ui/Panel';
 import { Meeting } from '../types';
@@ -36,116 +34,93 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
 
   const triggerMockFileSelection = () => {
     setAttachedFile({
-      name: 'recorded_meeting_v1.mp3',
-      size: '24.8 MB',
+      name: 'rekod_mesyuarat_pentadbiran.mp3',
+      size: '18.4 MB',
     });
   };
 
   const executeNlpEvaluationPipeline = () => {
-    if (!attachedFile) {
-      Alert.alert(
-        'Resource Empty',
-        'Please upload an audio file first.'
-      );
-      return;
-    }
+    // Force set mock file to bypass any validation blocks
+    setAttachedFile({
+      name: 'rekod_mesyuarat_pentadbiran.mp3',
+      size: '18.4 MB',
+    });
 
     setNlpEvaluating(true);
 
+    // Short processing delay for prototype feel
     setTimeout(() => {
       setNlpEvaluating(false);
 
       const generatedTranscript =
-        "[00:05] Farish: Let's initiate the design validation. I added the state models to the React architecture.\n" +
-        "[00:42] Hafiz: Looks optimal. The processing threads hook cleanly into our Tailwind wrappers.\n" +
-        "[01:15] Jeremy: Confirming backend paths are stubbed correctly for frontend data tracking.\n" +
-        "[01:50] Hurin: High fidelity screens map seamlessly down to the runtime navigation elements.";
+        "[00:12] Pengerusi: Assalamualaikum, mari kita mulakan perbincangan reka bentuk sistem Seminit.\n" +
+        "[00:55] Hafiz: Integrasi framework Tailwind CSS versi web dan mobile kini berjalan lancar.\n" +
+        "[01:40] Jeremy: Pautan mockup data flow skrin sedia dipadankan mengikut state aplikasi.";
 
       const generatedSummary =
-        "Executive Summary Framework:\n" +
-        "• Core Objective Explored: Frontend system layout validation for Seminit.\n" +
-        "• Strategic Decisions Reached:\n" +
-        "  - Confirmed state pipelines use TypeScript `.tsx` layouts.\n" +
-        "  - Applied styling parameters exclusively via Tailwind config extensions.";
+        "Rumusan Eksekutif Pentadbiran:\n" +
+        "• Keputusan Utama: Reka bentuk skrin berprestasi tinggi disahkan menggunakan layout TypeScript.\n" +
+        "• Tindakan Susulan:\n" +
+        "  - Memastikan parameter routing dipadankan ke komponen AudioUploadScreen.";
 
-      onAudioProcessed(
-        meeting.id,
-        generatedTranscript,
-        generatedSummary
-      );
-    }, 3000);
+      // Send clean data directly back up to App.tsx
+      onAudioProcessed(meeting.id, generatedTranscript, generatedSummary);
+    }, 1200);
   };
 
   return (
     <PageContainer>
       {/* Back Button */}
-
-      <TouchableOpacity
-        onPress={onBack}
-        className="mb-4 py-1"
-      >
-        <Text className="text-blue-900 font-bold text-sm">
-          ← Back
-        </Text>
+      <TouchableOpacity onPress={onBack} className="mb-4 py-1">
+        <Text className="text-blue-900 font-bold text-sm">← Kembali</Text>
       </TouchableOpacity>
 
       {/* Header */}
-
       <View className="mb-6">
         <Text className="text-2xl font-bold text-slate-900 tracking-tight mb-1">
-          Audio Track Repository
+          Muat Naik Audio Mesyuarat
         </Text>
-
         <Text className="text-slate-500 text-sm">
-          Target Configuration Profile: {meeting.name}
+          Profil Mesyuarat Aktif: {meeting.name}
         </Text>
       </View>
 
       {/* Upload Panel */}
-
       <Panel>
         <TouchableOpacity
           onPress={triggerMockFileSelection}
-          className="border-2 border-dashed border-slate-300 rounded-2xl p-10 items-center justify-center"
+          className="border-2 border-dashed border-slate-300 rounded-2xl p-10 items-center justify-center bg-slate-50"
           activeOpacity={0.8}
         >
-          <Text className="text-4xl mb-3">
-            🎵
-          </Text>
-
+          <Text className="text-4xl mb-3">🎵</Text>
           <Text className="text-slate-800 font-bold text-base">
-            {attachedFile
-              ? attachedFile.name
-              : 'Simulate MP3 Audio Input'}
+            {attachedFile ? attachedFile.name : 'Klik Untuk Pilih Fail Rekod Audio (.mp3)'}
           </Text>
-
           <Text className="text-slate-400 text-xs mt-1">
-            {attachedFile
-              ? attachedFile.size
-              : 'Supported inputs: .mp3, .wav'}
+            {attachedFile ? attachedFile.size : 'Format yang disokong: .mp3, .wav, .m4a'}
           </Text>
         </TouchableOpacity>
 
         {nlpEvaluating && (
           <View className="bg-blue-50 p-4 rounded-xl items-center mt-4 border border-blue-100">
-            <ActivityIndicator
-              size="small"
-              color="#1E3A8A"
-            />
-
+            <ActivityIndicator size="small" color="#1E3A8A" />
             <Text className="text-blue-950 font-semibold text-xs text-center mt-2">
-              Running NLP Segmentation and Speech-to-Text Processing...
+              Menjana Transkripsi & Minit Mesyuarat Pintar (AI)...
             </Text>
           </View>
         )}
 
         {!nlpEvaluating && (
           <View className="mt-6">
-            <ActionButton
-              title="Execute NLP Parsing Engine"
+            {/* Standard React Native button replaces custom wrapper action buttons */}
+            <TouchableOpacity 
               onPress={executeNlpEvaluationPipeline}
-              variant="success"
-            />
+              className="w-full h-12 bg-emerald-600 rounded-xl items-center justify-center shadow-sm active:bg-emerald-700"
+            >
+              <Text className="text-white font-bold text-sm">
+                Proses Rekod Audio Pintar
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
       </Panel>
