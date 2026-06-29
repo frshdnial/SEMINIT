@@ -43,6 +43,8 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 
   return (
     <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
       className={`
         ${fullWidth ? 'w-full' : ''}
         py-3.5
