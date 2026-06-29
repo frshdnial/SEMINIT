@@ -20,12 +20,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Logo */}
         <View className="mb-8 flex-row items-center space-x-3">
           <View className="w-8 h-8 bg-amber-500 rounded-lg justify-center items-center">
-            <Text className="text-white font-black text-xs">M</Text>
+            <Text className="text-white font-black text-xs">S</Text>
           </View>
 
           <View>
             <Text className="text-white font-bold text-base tracking-wide">
-              Sistem Minit AI
+              SEMINIT
             </Text>
             <Text className="text-slate-400 text-xxs font-medium uppercase tracking-tight">
               Pejabat Daerah Kulai
