@@ -73,6 +73,8 @@ export default function App() {
         <CreateMeetingScreen
           onSaveMeeting={handleCreateMeetingComplete}
           onBack={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')} // 💡 Added sidebar link
+          onNavigateToList={() => setCurrentScreen('LIST')}            // 💡 Added sidebar link
         />
       )}
 
@@ -87,7 +89,7 @@ export default function App() {
       {currentScreen === 'GENERATE' && activeSelectedMeeting && (
         <GenerateMinutesScreen
           meeting={activeSelectedMeeting}
-          // 👈 FIX: Directs routing screen state context back to the Dashboard instead of view minutes layout
+          // Directs routing screen state context back to the Dashboard instead of view minutes layout
           onSaveAndClose={() => setCurrentScreen('DASHBOARD')}
           onBack={() => setCurrentScreen('UPLOAD')}
         />
@@ -106,6 +108,8 @@ export default function App() {
           onBack={() => setCurrentScreen('DASHBOARD')}
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
           NavigateToViewMeetings={() => setCurrentScreen('MINUTES')}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')} // 💡 Added sidebar link
+          onSelectMeeting={handleSelectMeetingEntry}
         />
       )}
     </View>
