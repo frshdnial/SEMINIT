@@ -4,27 +4,33 @@ import { Sidebar } from './Sidebar';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  onNavigateToSetup: () => void;
-  onNavigateToList: () => void;
+  activeRoute: 'Dashboard' | 'MeetingList' | 'CreateMeeting'; // 👈 hardcoded per screen
+  onNavigateToSetup?: () => void;
+  onNavigateToList?: () => void;
+  onNavigateToDashboard?: () => void;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
-  onNavigateToSetup,
-  onNavigateToList,
+  activeRoute,
+  onNavigateToSetup = () => {},
+  onNavigateToList = () => {},
+  onNavigateToDashboard = () => {},
 }) => {
   return (
     <View className="flex-1 flex-col md:flex-row bg-[#F8FAFC] h-full">
-      {/* Sidebar should stretch full height */}
+      {/* Sidebar stays full height */}
       <View className="h-full">
         <Sidebar
+          activeRoute={activeRoute} // 👈 pass down
           onNavigateToSetup={onNavigateToSetup}
           onNavigateToList={onNavigateToList}
+          onNavigateToDashboard={onNavigateToDashboard}
         />
       </View>
 
-      {/* Content area should scroll */}
-      <ScrollView className="flex-1 w-full">
+      {/* Content area */}
+      <ScrollView className="flex-1 w-full" showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
     </View>

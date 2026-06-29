@@ -2,13 +2,17 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 interface SidebarProps {
+  activeRoute: string;
   onNavigateToSetup: () => void;
   onNavigateToList: () => void;
+  onNavigateToDashboard?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
+  activeRoute,
   onNavigateToSetup,
-  onNavigateToList
+  onNavigateToList,
+  onNavigateToDashboard = () => {},
 }) => {
   return (
     <View className="hidden md:flex w-64 bg-[#1E293B] p-6 h-full flex-col justify-between border-r border-slate-800">
@@ -31,22 +35,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation */}
         <View className="space-y-2">
-          <TouchableOpacity className="flex-row items-center bg-[#334155] px-4 py-3 rounded-xl">
-            <Text className="text-white font-semibold text-sm">Papan Pemuka</Text>
+          {/* Dashboard */}
+          <TouchableOpacity
+            className={`flex-row items-center px-4 py-3 rounded-xl ${
+              activeRoute === 'Dashboard' ? 'bg-[#334155]' : ''
+            }`}
+            onPress={onNavigateToDashboard}
+          >
+            <Text
+              className={`font-semibold text-sm ${
+                activeRoute === 'Dashboard' ? 'text-white' : 'text-slate-400'
+              }`}
+            >
+              Papan Pemuka
+            </Text>
           </TouchableOpacity>
 
+          {/* Meeting List */}
           <TouchableOpacity
-            className="flex-row items-center px-4 py-3 rounded-xl"
+            className={`flex-row items-center px-4 py-3 rounded-xl ${
+              activeRoute === 'MeetingList' ? 'bg-[#334155]' : ''
+            }`}
             onPress={onNavigateToList}
           >
-            <Text className="text-slate-400 font-medium text-sm">Senarai Mesyuarat</Text>
+            <Text
+              className={`font-semibold text-sm ${
+                activeRoute === 'MeetingList' ? 'text-white' : 'text-slate-400'
+              }`}
+            >
+              Senarai Mesyuarat
+            </Text>
           </TouchableOpacity>
 
+          {/* Create Meeting */}
           <TouchableOpacity
-            className="flex-row items-center px-4 py-3 rounded-xl"
+            className={`flex-row items-center px-4 py-3 rounded-xl ${
+              activeRoute === 'CreateMeeting' ? 'bg-[#334155]' : ''
+            }`}
             onPress={onNavigateToSetup}
           >
-            <Text className="text-slate-400 font-medium text-sm">Mesyuarat Baharu</Text>
+            <Text
+              className={`font-semibold text-sm ${
+                activeRoute === 'CreateMeeting' ? 'text-white' : 'text-slate-400'
+              }`}
+            >
+              Mesyuarat Baharu
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
