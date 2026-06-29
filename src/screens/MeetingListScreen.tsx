@@ -10,7 +10,7 @@ import { Meeting } from "../types";
 interface MeetingListScreenProps {
     meetings: Meeting[];
     onNavigateToSetup: () => void;
-    onNavigateToList: () => void;
+    NavigateToViewMeetings: () => void;
     onBack: () => void;
     onSelectMeeting: (meeting: Meeting) => void;
 }
@@ -18,21 +18,15 @@ interface MeetingListScreenProps {
 export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
     meetings,
     onNavigateToSetup,
-    onNavigateToList,
-    onBack,
-    onSelectMeeting
+    NavigateToViewMeetings,
+    onBack
 }) => {
     const [search, setSearch] = useState("");
     const filteredMeetings = meetings.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <AppLayout
-            activeRoute="MeetingList"
-            onNavigateToSetup={onNavigateToSetup}
-            onNavigateToList={onNavigateToList}
-            onNavigateToDashboard={() => {}}
-        >
+        <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={NavigateToViewMeetings}>
             <SafeAreaView className="flex-1 bg-gray-50">
                 <PageContainer>
                     <TouchableOpacity onPress={onBack} className="mb-4 py-1">
@@ -69,7 +63,9 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
                                         data={filteredMeetings}
                                         keyExtractor={(item) => item.id}
                                         renderItem={({ item }) => (
-                                            <MeetingListItem meeting={item} onPress={() => onSelectMeeting(item)} />
+                                            <View className="border-b border-slate-100 py-1">
+                                                <MeetingListItem meeting={item} onPress={() => NavigateToViewMeetings} />
+                                            </View>
                                         )}
                                         showsVerticalScrollIndicator={false}
                                     />
