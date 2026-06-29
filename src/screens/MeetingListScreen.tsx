@@ -10,14 +10,14 @@ import { Meeting } from "../types";
 interface MeetingListScreenProps {
     meetings: Meeting[];
     onNavigateToSetup: () => void;
-    onNavigateToList: () => void;
+    NavigateToViewMeetings: () => void;
     onBack: () => void;
 }
 
 export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
     meetings,
     onNavigateToSetup,
-    onNavigateToList,
+    NavigateToViewMeetings,
     onBack
 }) => {
     const [search, setSearch] = useState("");
@@ -26,7 +26,7 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
 
     //render the UI for the Meeting list screen
     return (
-        <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={onNavigateToList}>
+        <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={NavigateToViewMeetings}>
             <SafeAreaView className="flex-1 bg-gray-50">
                 <PageContainer>
 
@@ -69,7 +69,7 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
                                         keyExtractor={(item) => item.id}
                                         renderItem={({ item }) => (
                                             <View className="border-b border-slate-100 py-1">
-                                                <MeetingListItem meeting={item} onPress={() => console.log("Pressed:", item.id)} />
+                                                <MeetingListItem meeting={item} onPress={() => NavigateToViewMeetings} />
                                             </View>
                                         )}
                                         showsVerticalScrollIndicator={false}

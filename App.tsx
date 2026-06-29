@@ -89,6 +89,7 @@ export default function App() {
           meetings={meetings}
           onBack={() => setCurrentScreen('DASHBOARD')}
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
+          NavigateToViewMeetings={() => setCurrentScreen('MINUTES')}
         />
       )}
     </View>
