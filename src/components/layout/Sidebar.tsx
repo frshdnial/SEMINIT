@@ -1,5 +1,8 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+
+// Mengimport fail seminit-logo.png terus dari direktori root projek anda
+const SeminitLogo = require('../../../seminit-logo.png');
 
 interface SidebarProps {
   activeRoute: string;
@@ -17,17 +20,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <View className="hidden md:flex w-64 bg-[#1E293B] p-6 h-full flex-col justify-between border-r border-slate-800">
       <View>
-        {/* Logo */}
-        <View className="mb-8 flex-row items-center space-x-3">
-          <View className="w-8 h-8 bg-amber-500 rounded-lg justify-center items-center">
-            <Text className="text-white font-black text-xs">S</Text>
-          </View>
+        {/* Logo Section - Menggunakan items-start untuk sejajar dari atas teks */}
+        <View className="mb-8 flex-row items-start space-x-3">
+          {/* Saiz dibesarkan kepada 44px supaya ketinggiannya sama rata dengan 2 baris teks */}
+          <Image 
+            source={SeminitLogo} 
+            style={{ width: 44, height: 44, resizeMode: 'contain' }}
+          />
 
-          <View>
-            <Text className="text-white font-bold text-base tracking-wide">
+          <View className="justify-center">
+            <Text className="text-white font-bold text-base tracking-wide leading-tight">
               SEMINIT
             </Text>
-            <Text className="text-slate-400 text-xxs font-medium uppercase tracking-tight">
+            <Text className="text-slate-400 text-xxs font-medium uppercase tracking-tight mt-0.5 leading-normal">
               Pejabat Daerah Kulai
             </Text>
           </View>
