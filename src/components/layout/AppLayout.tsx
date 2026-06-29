@@ -4,27 +4,30 @@ import { Sidebar } from './Sidebar';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  onNavigateToSetup: () => void;
-  onNavigateToList: () => void;
+  onNavigateToSetup?: () => void;
+  onNavigateToList?: () => void;
+  onNavigateToDashboard?: () => void; // Included to protect dashboard/home navigation clicks
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
-  onNavigateToSetup,
-  onNavigateToList,
+  onNavigateToSetup = () => {},
+  onNavigateToList = () => {},
+  onNavigateToDashboard = () => {},
 }) => {
   return (
     <View className="flex-1 flex-col md:flex-row bg-[#F8FAFC] h-full">
-      {/* Sidebar should stretch full height */}
+      {/* Sidebar stays full height */}
       <View className="h-full">
         <Sidebar
           onNavigateToSetup={onNavigateToSetup}
           onNavigateToList={onNavigateToList}
+          // Note: SidebarProps does not include onNavigateToDashboard, so we avoid passing it to prevent TS error.
         />
       </View>
 
-      {/* Content area should scroll */}
-      <ScrollView className="flex-1 w-full">
+      {/* Content area */}
+      <ScrollView className="flex-1 w-full" showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
     </View>

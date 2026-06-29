@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import {
   Alert,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
-  Platform,
-  TextInput,
+  View
 } from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -115,8 +114,8 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
                   <Text className="text-sm font-medium text-slate-700 mb-2">Tarikh *</Text>
 
                   {Platform.OS === 'web' ? (
-                    <TextInput
-                      type="date" // works in RN Web
+                    <input
+                      type="date"
                       value={date}
                       onChange={(e: any) => setDate(e.target.value)}
                       className="h-12 px-4 border border-slate-300 rounded-xl bg-white"
