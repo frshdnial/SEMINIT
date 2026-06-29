@@ -36,19 +36,22 @@ The application architecture is broken down into four intelligent subsystems:
 The platform uses a robust, multi-layered stack designed for asynchronous high performance, cross-language AI integration, and secure scalability.
 
 ### Solution Architecture Flow
-[ Frontend: React + Tailwind CSS ]
-│
-▼ (RESTful API)
-[ Backend Layer: Node.js ]
-│
-▼ (RESTful API)
-[ AI Integration Layer: FastAPI ]
-│
-├─► [ Transcription Layer: ClipChamp AI ]
-└─► [ Natural Language Model: OpenAI API ]
-│
-▼
-[ Database & Storage: MongoDB & Oracle Cloud Infrastructure (OCI) ]
+
+   ```bash
+   [ Frontend: React + Tailwind CSS ]
+   │
+   ▼ (RESTful API)
+   [ Backend Layer: Node.js ]
+   │
+   ▼ (RESTful API)
+   [ AI Integration Layer: FastAPI ]
+   │
+   ├─► [ Transcription Layer: ClipChamp AI ]
+   └─► [ Natural Language Model: OpenAI API ]
+   │
+   ▼
+   [ Database & Storage: MongoDB & Oracle Cloud Infrastructure (OCI) ]
+   ```
 
 ### Component Details
 * **Frontend:** Built with **React** for a component-based, highly maintainable user interface, styled using **Tailwind CSS** for clean utility-first design.
