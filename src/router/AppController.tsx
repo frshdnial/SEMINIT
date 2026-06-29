@@ -98,8 +98,8 @@ export default function AppController() {
         <MeetingListScreen
               meetings={meetings}
               onNavigateToSetup={navigateToSetup}
-              onNavigateToList={navigateToList}
-              onBack={navigateToDashboard} onSelectMeeting={function (meeting: Meeting): void {
+              onBack={navigateToDashboard}
+              onSelectMeeting={handleSelectMeetingListItem} NavigateToViewMeetings={function (): void {
                   throw new Error('Function not implemented.');
               } }        />
       );

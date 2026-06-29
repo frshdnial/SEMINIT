@@ -26,7 +26,7 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
         item.name.toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={NavigateToViewMeetings}>
+            <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={NavigateToViewMeetings} activeRoute={"CreateMeeting"}>
             <SafeAreaView className="flex-1 bg-gray-50">
                 <PageContainer>
                     <TouchableOpacity onPress={onBack} className="mb-4 py-1">
