@@ -27,7 +27,12 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
         item.name.toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={onNavigateToList}>
+        <AppLayout
+            activeRoute="MeetingList"
+            onNavigateToSetup={onNavigateToSetup}
+            onNavigateToList={onNavigateToList}
+            onNavigateToDashboard={() => {}}
+        >
             <SafeAreaView className="flex-1 bg-gray-50">
                 <PageContainer>
                     <TouchableOpacity onPress={onBack} className="mb-4 py-1">
@@ -73,7 +78,10 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
                         </View>
 
                         <View className="mt-6 pt-4 border-t border-slate-100 w-full">
-                            <TouchableOpacity onPress={onNavigateToSetup} className="flex items-center h-12 bg-blue-900 rounded-xl justify-center">
+                            <TouchableOpacity
+                                onPress={onNavigateToSetup}
+                                className="flex items-center h-12 bg-blue-900 rounded-xl justify-center"
+                            >
                                 <Text className="font-medium text-white">+ Bina Rekod Baru</Text>
                             </TouchableOpacity>
                         </View>
@@ -83,3 +91,5 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
         </AppLayout>
     );
 };
+
+export default MeetingListScreen;

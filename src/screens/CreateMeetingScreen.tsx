@@ -55,8 +55,6 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
   };
 
   const handleFormSubmission = () => {
-    // Prototype Safety Rule: Use whatever text is typed, OR fallback to clean mock data
-    // This guarantees clicking the button will ALWAYS move to the AudioUploadScreen.
     const finalName = name.trim() || 'Mesyuarat Cadangan Projek Seminit';
     const finalDate = date || new Date().toISOString().split('T')[0];
     const finalLocation = location.trim() || 'Bilik Mesyuarat Utama, Aras 3';
@@ -76,12 +74,16 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
       summary: '',    
     };
 
-    // Fires handleCreateMeetingComplete in App.tsx to change currentScreen to 'UPLOAD'
     onSaveMeeting(constructedPayload);
   };
 
   return (
-    <AppLayout onNavigateToSetup={() => {}}>
+    <AppLayout
+      activeRoute="CreateMeeting"
+      onNavigateToSetup={() => {}}
+      onNavigateToList={() => {}}
+      onNavigateToDashboard={() => {}}
+    >
       <PageContainer>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -240,3 +242,5 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
     </AppLayout>
   );
 };
+
+export default CreateMeetingScreen;

@@ -4,13 +4,15 @@ import { Sidebar } from './Sidebar';
 
 interface AppLayoutProps {
   children: React.ReactNode;
+  activeRoute: 'Dashboard' | 'MeetingList' | 'CreateMeeting'; // 👈 hardcoded per screen
   onNavigateToSetup?: () => void;
   onNavigateToList?: () => void;
-  onNavigateToDashboard?: () => void; // Included to protect dashboard/home navigation clicks
+  onNavigateToDashboard?: () => void;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
+  activeRoute,
   onNavigateToSetup = () => {},
   onNavigateToList = () => {},
   onNavigateToDashboard = () => {},
@@ -20,9 +22,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       {/* Sidebar stays full height */}
       <View className="h-full">
         <Sidebar
+          activeRoute={activeRoute} // 👈 pass down
           onNavigateToSetup={onNavigateToSetup}
           onNavigateToList={onNavigateToList}
-          // Note: SidebarProps does not include onNavigateToDashboard, so we avoid passing it to prevent TS error.
+          onNavigateToDashboard={onNavigateToDashboard}
         />
       </View>
 

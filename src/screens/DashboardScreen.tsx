@@ -27,7 +27,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   const processingMeetings = meetings.filter((m) => m.status === 'Pending Audio').length;
 
   return (
-    <AppLayout onNavigateToSetup={onNavigateToSetup} onNavigateToList={onNavigateToList}>
+    <AppLayout
+      activeRoute="Dashboard" 
+      onNavigateToSetup={onNavigateToSetup}
+      onNavigateToList={onNavigateToList}
+      onNavigateToDashboard={() => {}} // optional, can wire navigation if needed
+    >
       <PageContainer>
         {/* Header */}
         <View className="mb-6 flex-row justify-between items-center">
@@ -109,3 +114,5 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
     </AppLayout>
   );
 };
+
+export default DashboardScreen;
