@@ -12,7 +12,7 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
   onNavigateToSetup,
-  onNavigateToList
+  onNavigateToList,
 }) => {
   return (
     <View className="flex-1 flex-col md:flex-row bg-[#F8FAFC]">
@@ -21,7 +21,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         onNavigateToList={onNavigateToList}
       />
 
-      {children}
+      {/* This is the missing piece */}
+      <View className="flex-1 w-full">
+        {children}
+      </View>
     </View>
   );
 };
