@@ -11,7 +11,7 @@ interface MeetingListScreenProps {
   meetings: Meeting[];
   onNavigateToSetup: () => void;
   NavigateToViewMeetings: () => void;
-  onNavigateToDashboard: () => void; // Registered
+  onNavigateToDashboard: () => void;
   onBack: () => void;
   onSelectMeeting: (meeting: Meeting) => void;
 }
@@ -21,7 +21,7 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
   onNavigateToSetup,
   NavigateToViewMeetings,
   onNavigateToDashboard,
-  onBack
+  onSelectMeeting,
 }) => {
   const [search, setSearch] = useState("");
   const filteredMeetings = meetings.filter((item) =>
@@ -32,31 +32,31 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
     <AppLayout 
       onNavigateToSetup={onNavigateToSetup} 
       onNavigateToList={NavigateToViewMeetings} 
-      onNavigateToDashboard={onNavigateToDashboard} // Bound correctly
-      activeRoute={"MeetingList"} // FIXED HIGHLIGHT
+      onNavigateToDashboard={onNavigateToDashboard}
+      activeRoute={"MeetingList"}
     >
       <SafeAreaView className="flex-1 bg-gray-50">
         <PageContainer>
-          <TouchableOpacity onPress={onBack} className="mb-4 py-1">
-            <Text className="text-blue-900 font-bold text-sm">← Kembali</Text>
-          </TouchableOpacity>
-
-          <Panel className="w-full p-6 flex-1 justify-between min-h-[75vh]">
-            <View className="flex-1 w-full">
-              <Text className="text-2xl font-bold text-slate-900 tracking-tight mb-4">
-                Senarai Semua Mesyuarat
+          <View className="mb-6 flex-row justify-between items-center">
+            <View>
+              <Text className="text-2xl font-bold text-slate-900 tracking-tight">
+                Senarai Mesyuarat
               </Text>
+              <Text className="text-slate-500 text-sm mt-1">
+                Arkib pengurusan fail minit organisasi
+              </Text>
+            </View>
+          </View>
 
-              <View className="flex-row items-center gap-2 px-3 border border-slate-200 rounded-xl bg-white mb-6 w-full">
-                <Text className="text-gray-500">🔎</Text>
-                <View className="flex-1">
-                  <CustomInput
-                    label=""
-                    placeholder="Cari tajuk mesyuarat..."
-                    value={search}
-                    onChangeText={setSearch}
-                  />
-                </View>
+          <Panel className="flex-1 items-start justify-start p-6">
+            <View className="w-full flex-1">
+              <View className="mb-4 w-full">
+                <CustomInput
+                  label=""
+                  placeholder="Cari rekod mesyuarat..."
+                  value={search}
+                  onChangeText={setSearch}
+                />
               </View>
 
               <View className="flex-1 w-full">
@@ -72,7 +72,8 @@ export const MeetingListScreen: React.FC<MeetingListScreenProps> = ({
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                       <View className="border-b border-slate-100 py-1">
-                        <MeetingListItem meeting={item} onPress={() => NavigateToViewMeetings()} />
+                        {/* 👈 UPDATED: Triggers core onSelectMeeting context router handler */}
+                        <MeetingListItem meeting={item} onPress={() => onSelectMeeting(item)} />
                       </View>
                     )}
                     showsVerticalScrollIndicator={false}

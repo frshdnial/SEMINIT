@@ -6,14 +6,15 @@ import "./global.css";
 import { AudioUploadScreen } from '@/screens/AudioUploadScreen';
 import { CreateMeetingScreen } from '@/screens/CreateMeetingScreen';
 import { DashboardScreen } from '@/screens/DashboardScreen';
-import { FormatMinutesScreen } from '@/screens/FormatMinutesScreen'; // 👈 1. Import new screen
+import { FormatMinutesScreen } from '@/screens/FormatMinutesScreen';
 import { GenerateMinutesScreen } from '@/screens/GenerateMinutesScreen';
 import { MeetingListScreen } from '@/screens/MeetingListScreen';
+import { MinutesProductionScreen } from '@/screens/MinutesProductionScreen'; // 👈 1. Import new file
 import { ViewMinutesScreen } from '@/screens/ViewMinutesScreen';
 import { Meeting } from '@/types';
 
-// 👈 2. Added 'FORMAT' to state router types
-type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'GENERATE' | 'FORMAT' | 'MINUTES' | 'LIST';
+// 👈 2. Add 'PRODUCTION' into the configuration state
+type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'GENERATE' | 'FORMAT' | 'PRODUCTION' | 'MINUTES' | 'LIST';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('DASHBOARD');
@@ -45,7 +46,6 @@ export default function App() {
     setCurrentScreen('GENERATE');
   };
 
-  // 👈 3. Callback triggered from FormatMinutesScreen confirming modifications
   const handleFinalizedMinutesSaving = (finalSummary: string) => {
     if (!activeSelectedMeeting) return;
 
@@ -54,20 +54,20 @@ export default function App() {
       summary: finalSummary,
     };
 
-    // Commit final edits to global historical tracking lists
     setMeetings((prev) =>
       prev.map((item) => (item.id === lockedMeeting.id ? lockedMeeting : item))
     );
     setActiveSelectedMeeting(lockedMeeting);
     
-    // Redirect cleanly right back to Dashboard Papan Pemuka!
+    // Redirect cleanly back to Dashboard
     setCurrentScreen('DASHBOARD');
   };
 
   const handleSelectMeetingEntry = (meeting: Meeting) => {
     setActiveSelectedMeeting(meeting);
     if (meeting.status === 'Completed') {
-      setCurrentScreen('MINUTES');
+      // 👈 3. Route finished documents directly into the brand new production styling layout
+      setCurrentScreen('PRODUCTION'); 
     } else {
       setCurrentScreen('UPLOAD');
     }
@@ -90,6 +90,8 @@ export default function App() {
         <CreateMeetingScreen
           onSaveMeeting={handleCreateMeetingComplete}
           onBack={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToList={() => setCurrentScreen('LIST')}
         />
       )}
 
@@ -104,18 +106,24 @@ export default function App() {
       {currentScreen === 'GENERATE' && activeSelectedMeeting && (
         <GenerateMinutesScreen
           meeting={activeSelectedMeeting}
-          // 👈 4. Instead of closing, clicking action pushes to Formatting template review engine next
           onSaveAndClose={() => setCurrentScreen('FORMAT')}
           onBack={() => setCurrentScreen('UPLOAD')}
         />
       )}
 
-      {/* 👈 5. Active Screen Renderer Condition Block for FormatMinutesScreen */}
       {currentScreen === 'FORMAT' && activeSelectedMeeting && (
         <FormatMinutesScreen
           meeting={activeSelectedMeeting}
           onSaveAndConfirm={handleFinalizedMinutesSaving}
           onBack={() => setCurrentScreen('GENERATE')}
+        />
+      )}
+
+      {/* 👈 4. Mount and bind the new custom Production Screen View */}
+      {currentScreen === 'PRODUCTION' && activeSelectedMeeting && (
+        <MinutesProductionScreen
+          meeting={activeSelectedMeeting}
+          onBack={() => setCurrentScreen('DASHBOARD')}
         />
       )}
 
@@ -131,7 +139,7 @@ export default function App() {
           meetings={meetings}
           onBack={() => setCurrentScreen('DASHBOARD')}
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
-          NavigateToViewMeetings={() => setCurrentScreen('MINUTES')}
+          NavigateToViewMeetings={() => setCurrentScreen('LIST')}
           onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
           onSelectMeeting={handleSelectMeetingEntry}
         />

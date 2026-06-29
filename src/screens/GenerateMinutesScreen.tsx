@@ -93,7 +93,7 @@ export const GenerateMinutesScreen: React.FC<GenerateMinutesScreenProps> = ({
           className="w-full h-12 bg-blue-900 rounded-xl items-center justify-center shadow-sm active:bg-blue-950"
         >
           <Text className="text-white font-bold text-sm">
-            Sahkan & Simpan Minit Mesyuarat
+            Edit Minit Mesyuarat Rasmi
           </Text>
         </TouchableOpacity>
       </View>
