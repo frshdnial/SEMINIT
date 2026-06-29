@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 
+import routes from "./routes/index.js";
+
 const app = express();
 
 app.use(cors());
@@ -16,6 +18,8 @@ app.get("/", (req, res) => {
         version: "1.0.0"
     });
 });
+
+app.use("/api", routes);
 
 app.get("/api/health", (req, res) => {
     res.status(200).json({
