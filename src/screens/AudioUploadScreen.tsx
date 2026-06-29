@@ -162,30 +162,34 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
 
               <TouchableOpacity
                 onPress={() => setAudioMethod("UPLOAD")}
-                className="bg-blue-900 rounded-2xl p-6 items-center mb-4"
+                className="bg-white border border-slate-200 rounded-2xl p-6 items-center mb-4 active:bg-slate-50"
               >
-                <Text className="text-5xl mb-2">🎵</Text>
+                <View className="w-14 h-14 rounded-full bg-blue-50 items-center justify-center mb-3">
+                  <Text className="text-3xl">🎵</Text>
+                </View>
 
-                <Text className="text-white font-bold text-lg">
+                <Text className="text-slate-800 font-semibold text-lg">
                   Muat Naik Audio
                 </Text>
 
-                <Text className="text-blue-100 text-sm mt-1">
+                <Text className="text-slate-500 text-sm mt-1 text-center">
                   Pilih fail audio daripada peranti
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => setAudioMethod("RECORD")}
-                className="bg-red-600 rounded-2xl p-6 items-center"
+                className="bg-white border border-slate-200 rounded-2xl p-6 items-center active:bg-slate-50"
               >
-                <Text className="text-5xl mb-2">🎙</Text>
+                <View className="w-14 h-14 rounded-full bg-red-50 items-center justify-center mb-3">
+                  <Text className="text-3xl">🎙</Text>
+                </View>
 
-                <Text className="text-white font-bold text-lg">
+                <Text className="text-slate-800 font-semibold text-lg">
                   Rakam Audio
                 </Text>
 
-                <Text className="text-red-100 text-sm mt-1">
+                <Text className="text-slate-500 text-sm mt-1 text-center">
                   Rakam mesyuarat secara langsung
                 </Text>
               </TouchableOpacity>
