@@ -23,6 +23,7 @@ export const MinutesProductionScreen: React.FC<MinutesProductionScreenProps> = (
 }) => {
   return (
     <AppLayout
+      activeRoute="CreateMeeting"
       onNavigateToSetup={onNavigateToSetup}
       onNavigateToList={onNavigateToList}
       onNavigateToDashboard={onNavigateToDashboard}

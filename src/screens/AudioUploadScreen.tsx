@@ -145,6 +145,7 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
 
   return (
     <AppLayout
+      activeRoute="CreateMeeting"
       onNavigateToSetup={onNavigateToSetup}
       onNavigateToList={onNavigateToList}
       onNavigateToDashboard={onNavigateToDashboard}

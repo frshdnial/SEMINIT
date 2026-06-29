@@ -27,6 +27,7 @@ export const FormatMinutesScreen: React.FC<FormatMinutesScreenProps> = ({
 
   return (
     <AppLayout
+      activeRoute="CreateMeeting"
       onNavigateToSetup={onNavigateToSetup}
       onNavigateToList={onNavigateToList}
       onNavigateToDashboard={onNavigateToDashboard}

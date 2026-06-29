@@ -88,9 +88,12 @@ export default function AppController() {
     case 'CREATE_MEETING':
       return (
         <CreateMeetingScreen
-          onSaveMeeting={handleSaveNewMeeting}
-          onBack={navigateToDashboard}
-        />
+              onSaveMeeting={handleSaveNewMeeting}
+              onBack={navigateToDashboard} onNavigateToDashboard={function (): void {
+                  throw new Error('Function not implemented.');
+              } } onNavigateToList={function (): void {
+                  throw new Error('Function not implemented.');
+              } }        />
       );
 
     case 'MEETING_LIST':
@@ -100,6 +103,8 @@ export default function AppController() {
               onNavigateToSetup={navigateToSetup}
               onBack={navigateToDashboard}
               onSelectMeeting={handleSelectMeetingListItem} NavigateToViewMeetings={function (): void {
+                  throw new Error('Function not implemented.');
+              } } onNavigateToDashboard={function (): void {
                   throw new Error('Function not implemented.');
               } }        />
       );
