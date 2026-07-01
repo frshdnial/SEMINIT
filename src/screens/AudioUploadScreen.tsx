@@ -1,6 +1,9 @@
+import * as DocumentPicker from 'expo-document-picker';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   Text,
   TouchableOpacity,
   View,
@@ -9,7 +12,40 @@ import {
 import { AppLayout } from '../components/layout/AppLayout';
 import { PageContainer } from '../components/ui/PageContainer';
 import { Panel } from '../components/ui/Panel';
+import { API_ENDPOINTS } from '../config/api';
 import { Meeting } from '../types';
+
+// Format dan saiz fail audio yang dibenarkan, dipadankan dengan validation
+// rule 'mimes:mp3,wav,m4a,mpga|max:51200' di MeetingController@uploadAudio
+const ALLOWED_AUDIO_EXTENSIONS = ['mp3', 'wav', 'm4a'];
+const MAX_AUDIO_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
+
+const showAlert = (title: string, message: string) => {
+  if (Platform.OS === 'web') {
+    alert(message);
+  } else {
+    Alert.alert(title, message);
+  }
+};
+
+const formatFileSize = (bytes?: number) => {
+  if (!bytes || bytes <= 0) return '';
+  const mb = bytes / (1024 * 1024);
+  return `${mb.toFixed(1)} MB`;
+};
+
+interface AttachedAudioFile {
+  name: string;
+  size: string;
+  uri: string;
+  mimeType?: string;
+  // Present only on web (react-native-web) — the real browser File object,
+  // used to build FormData directly instead of relying on the file:// uri.
+  webFile?: File;
+  // False for the still-mocked "record live" flow below — only real,
+  // user-picked files are actually uploaded to the backend.
+  isRealFile: boolean;
+}
 
 interface AudioUploadScreenProps {
   meeting: Meeting;
@@ -32,10 +68,7 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
   onNavigateToList = () => {},
   onNavigateToDashboard = () => {},
 }) => {
-  const [attachedFile, setAttachedFile] = useState<{
-    name: string;
-    size: string;
-  } | null>(null);
+  const [attachedFile, setAttachedFile] = useState<AttachedAudioFile | null>(null);
 
   const [recording, setRecording] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -46,6 +79,7 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
   >("NONE");
 
   const [nlpEvaluating, setNlpEvaluating] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
 
   // Bersihkan pemasa jika komponen di-unmount semasa merekod
   useEffect(() => {
@@ -56,12 +90,109 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
     };
   }, []);
 
-  const triggerMockFileSelection = () => {
-    setAttachedFile({
-      name: 'rekod_mesyuarat_bantuan_kulai.mp3',
-      size: '34.2 MB',
-    });
+  // Membuka pemilih fail sistem sebenar dan mengesahkan format & saiz fail
+  // audio yang dipilih sebelum ia dibenarkan untuk dimuat naik.
+  const pickAudioFile = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          'audio/mpeg',
+          'audio/mp3',
+          'audio/wav',
+          'audio/x-wav',
+          'audio/m4a',
+          'audio/x-m4a',
+          'audio/*',
+        ],
+        copyToCacheDirectory: true,
+        multiple: false,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      const extension = asset.name?.split('.').pop()?.toLowerCase() ?? '';
+
+      if (!ALLOWED_AUDIO_EXTENSIONS.includes(extension)) {
+        showAlert(
+          'Format Tidak Disokong',
+          'Sila pilih fail audio dalam format .mp3, .wav atau .m4a sahaja.'
+        );
+        return;
+      }
+
+      if (asset.size && asset.size > MAX_AUDIO_FILE_SIZE_BYTES) {
+        showAlert('Fail Terlalu Besar', 'Saiz fail melebihi had maksimum 50MB.');
+        return;
+      }
+
+      setAttachedFile({
+        name: asset.name,
+        size: formatFileSize(asset.size),
+        uri: asset.uri,
+        mimeType: asset.mimeType,
+        webFile: (asset as any).file,
+        isRealFile: true,
+      });
+    } catch (error) {
+      console.error('Ralat memilih fail audio:', error);
+      showAlert('Ralat', 'Gagal memilih fail audio. Sila cuba lagi.');
+    }
   };
+
+  // Menghantar fail audio sebenar ke backend Laravel (multipart/form-data),
+  // yang menyimpannya ke storage/app/public/meeting_audio dan mengemaskini
+  // lajur audio_path bagi rekod mesyuarat ini dalam pangkalan data.
+  const uploadAudioToServer = async (): Promise<boolean> => {
+    if (!attachedFile) return false;
+
+    const formData = new FormData();
+
+    if (Platform.OS === 'web' && attachedFile.webFile) {
+      formData.append('audio', attachedFile.webFile, attachedFile.name);
+    } else {
+      formData.append('audio', {
+        uri: attachedFile.uri,
+        name: attachedFile.name,
+        type: attachedFile.mimeType || 'audio/mpeg',
+      } as any);
+    }
+
+    setUploadingAudio(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.uploadAudio(meeting.id), {
+        method: 'POST',
+        headers: {
+          // Sengaja TIDAK menetapkan 'Content-Type' secara manual di sini —
+          // fetch perlu menjana boundary multipart secara automatik sendiri.
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const message =
+          result?.errors?.audio?.[0] ||
+          result?.message ||
+          'Gagal memuat naik fail audio ke pelayan.';
+        showAlert('Ralat Muat Naik', message);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Ralat rangkaian ketika memuat naik audio:', error);
+      showAlert('Ralat', 'Ralat sambungan rangkaian ke pelayan.');
+      return false;
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
+
 
   const startRecording = () => {
     setRecording(true);
@@ -104,11 +235,30 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
     setAttachedFile({
       name: "meeting_recording.wav",
       size: "Recorded Audio",
+      uri: '',
+      isRealFile: false,
     });
   };
 
-  const executeNlpEvaluationPipeline = () => {
+  const executeNlpEvaluationPipeline = async () => {
+    if (!attachedFile) return;
+
     setNlpEvaluating(true);
+
+    // Muat naik fail audio SEBENAR ke backend Laravel & pangkalan data dahulu.
+    // (Mod rakaman langsung masih placeholder buat masa ini — lihat isRealFile.)
+    if (attachedFile.isRealFile) {
+      const uploaded = await uploadAudioToServer();
+      if (!uploaded) {
+        setNlpEvaluating(false);
+        return;
+      }
+    }
+
+    // NOTA: Transkripsi & rumusan di bawah masih dijana secara mock/placeholder
+    // kerana perkhidmatan Speech-to-Text/NLP sebenar belum disambungkan lagi.
+    // Fail audio itu sendiri, bagaimanapun, kini benar-benar dimuat naik dan
+    // disimpan di backend/pangkalan data di atas.
     setTimeout(() => {
       setNlpEvaluating(false);
       
@@ -194,7 +344,7 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
             {audioMethod === "UPLOAD" && !nlpEvaluating && (
               <>
                 <TouchableOpacity
-                  onPress={triggerMockFileSelection}
+                  onPress={pickAudioFile}
                   className="border-2 border-dashed border-slate-300 rounded-2xl p-10 items-center justify-center bg-slate-50"
                   activeOpacity={0.8}
                 >
@@ -306,7 +456,9 @@ export const AudioUploadScreen: React.FC<AudioUploadScreenProps> = ({
               <View className="bg-blue-50 p-4 rounded-xl items-center mt-4 border border-blue-100">
                 <ActivityIndicator size="small" color="#1E3A8A" />
                 <Text className="text-blue-950 font-semibold text-xs mt-2 text-center">
-                  Menjana Transkripsi & Minit Mesyuarat Pintar (AI)...
+                  {uploadingAudio
+                    ? 'Memuat naik fail audio ke pelayan...'
+                    : 'Menjana Transkripsi & Minit Mesyuarat Pintar (AI)...'}
                 </Text>
               </View>
             )}
