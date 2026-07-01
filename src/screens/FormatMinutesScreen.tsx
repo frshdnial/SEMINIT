@@ -56,7 +56,7 @@ export const FormatMinutesScreen: React.FC<FormatMinutesScreenProps> = ({
             {/* Metadata Grid Block */}
             <View className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 flex flex-col md:flex-row md:flex-wrap gap-4">
               <View className="w-full md:w-[48%] flex-row"><Text className="w-24 font-bold text-xs text-slate-600">Tarikh:</Text><Text className="text-xs text-slate-800">{meeting.date}</Text></View>
-              <View className="w-full md:w-[48%] flex-row"><Text className="w-24 font-bold text-xs text-slate-600">Masa:</Text><Text className="text-xs text-slate-800">{meeting.startTime} - {meeting.endTime}</Text></View>
+              <View className="w-full md:w-[48%] flex-row"><Text className="w-24 font-bold text-xs text-slate-600">Masa:</Text><Text className="text-xs text-slate-800">{meeting.start_time} - {meeting.end_time}</Text></View>
               <View className="w-full md:w-[48%] flex-row"><Text className="w-24 font-bold text-xs text-slate-600">Lokasi:</Text><Text className="text-xs text-slate-800">{meeting.location}</Text></View>
               <View className="w-full md:w-[48%] flex-row"><Text className="w-24 font-bold text-xs text-slate-600">Kehadiran:</Text><Text className="text-xs text-slate-800 flex-1">{meeting.participants || '-'}</Text></View>
             </View>
