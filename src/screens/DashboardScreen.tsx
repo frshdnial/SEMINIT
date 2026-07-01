@@ -43,6 +43,11 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
     ? Math.max((completedMeetings / axisMax) * CHART_MAX_HEIGHT, 6)
     : CHART_MIN_HEIGHT;
 
+  // Both dashboard panels share this exact height. Status Analisis's content
+  // naturally fits within it; Mesyuarat Terbaru's meeting list scrolls
+  // internally (via flex-1 below) instead of growing the card taller.
+  const DASHBOARD_PANEL_HEIGHT = 480; // px
+
   return (
     <AppLayout
       activeRoute="Dashboard" 
@@ -69,14 +74,17 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
           <StatCard title="Jam Dijimatkan" value="16 Jam" accent="info" />
         </View>
 
-        <View className="flex-1 flex-col lg:flex-row gap-6 items-stretch w-full">
+        <View className="flex-1 flex-col lg:flex-row gap-6 items-start w-full">
           {/* Chart Graphic Area */}
-          <Panel className="flex-1 lg:max-w-xs justify-between">
+          <Panel className="flex-1 lg:max-w-xs" style={{ height: DASHBOARD_PANEL_HEIGHT }}>
             <View>
               <Text className="text-base font-bold text-slate-900 mb-1">Status Analisis</Text>
               <Text className="text-xs text-slate-400 mb-6">Pecahan rekod semasa</Text>
             </View>
 
+            {/* Chart block sits directly below the header — the panel now
+                sizes to its own content instead of stretching to match the
+                meeting list panel beside it, so no extra centering is needed. */}
             <View>
               <View className="flex-row" style={{ height: CHART_MAX_HEIGHT }}>
                 {/* Y-axis scale */}
@@ -86,29 +94,29 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                   <Text className="text-[10px] text-slate-400 font-medium">0</Text>
                 </View>
 
-                {/* Plot area: gridlines + baseline + bars */}
-                <View className="flex-1 relative" style={{ height: CHART_MAX_HEIGHT }}>
-                  <View className="absolute left-0 right-0 top-0 border-t border-slate-100" />
-                  <View className="absolute left-0 right-0 border-t border-slate-100" style={{ top: '50%' }} />
-                  <View className="absolute left-0 right-0 bottom-0 border-t border-slate-300" />
-
-                  <View className="absolute left-0 right-0 bottom-0 flex-row items-end justify-center space-x-10">
-                    <View
-                      className="w-10 bg-amber-500 rounded-t-md"
-                      style={{ height: pendingAudioBarHeight }}
-                    />
-                    <View
-                      className="w-10 bg-emerald-500 rounded-t-md"
-                      style={{ height: completedBarHeight }}
-                    />
-                  </View>
+                {/* Plot area: bars anchored to the bottom by normal flow
+                    (items-end), bounded by a top gridline and a bottom
+                    baseline border — no absolute positioning, so it can't
+                    escape its container on any screen size or browser. */}
+                <View
+                  className="flex-1 flex-row items-end justify-center space-x-10 border-t border-slate-100"
+                  style={{ height: CHART_MAX_HEIGHT, borderBottomWidth: 2, borderBottomColor: '#cbd5e1' }}
+                >
+                  <View
+                    className="w-10 bg-amber-500 rounded-t-md"
+                    style={{ height: pendingAudioBarHeight }}
+                  />
+                  <View
+                    className="w-10 bg-emerald-500 rounded-t-md"
+                    style={{ height: completedBarHeight }}
+                  />
                 </View>
               </View>
 
               {/* X-axis category labels, offset to line up under the plot area */}
               <View className="flex-row justify-center space-x-6 mt-2 pl-8">
-                <Text className="text-xxs text-slate-500 font-medium w-14 text-center">Pending Audio</Text>
-                <Text className="text-xxs text-slate-500 font-medium w-14 text-center">Completed</Text>
+                <Text className="text-xxs text-slate-500 font-medium w-20 text-center">Pending Audio</Text>
+                <Text className="text-xxs text-slate-500 font-medium w-20 text-center">Completed</Text>
               </View>
 
               {/* Legend with the exact counts, so the numbers are still verifiable against the stat cards above */}
@@ -126,8 +134,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
           </Panel>
 
           {/* Meeting Feed */}
-          <Panel className="flex-[2] justify-between">
-            <View className="flex-1">
+          <Panel className="flex-[2] justify-between" style={{ height: DASHBOARD_PANEL_HEIGHT }}>
+            <View className="flex-1" style={{ minHeight: 0 }}>
               <View className="flex-row justify-between items-center mb-4">
                 <View>
                   <Text className="text-base font-bold text-slate-900 mb-1">Mesyuarat Terbaru</Text>
@@ -148,18 +156,16 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                   </Text>
                 </View>
               ) : (
-                <View className="max-h-[420px]">
-                  <FlatList
-                    data={meetings}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                      <MeetingListItem meeting={item} onPress={() => onSelectMeeting(item)} />
-                    )}
-                    showsVerticalScrollIndicator={false}
-                    style={{ maxHeight: 420 }}
-                    nestedScrollEnabled
-                  />
-                </View>
+                <FlatList
+                  data={meetings}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <MeetingListItem meeting={item} onPress={() => onSelectMeeting(item)} />
+                  )}
+                  showsVerticalScrollIndicator={false}
+                  style={{ flex: 1 }}
+                  nestedScrollEnabled
+                />
               )}
             </View>
 
