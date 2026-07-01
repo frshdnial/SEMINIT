@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   Platform,
   ScrollView,
   Text,
@@ -15,6 +16,7 @@ import { CustomInput } from '../components/CustomInput';
 import { AppLayout } from '../components/layout/AppLayout';
 import { PageContainer } from '../components/ui/PageContainer';
 
+import { API_ENDPOINTS } from '../config/api'; // Added import for backend routes
 import { Meeting } from '../types';
 
 interface CreateMeetingScreenProps {
@@ -65,9 +67,14 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
         '-' +
         String(pickedDate.getDate()).padStart(2, '0');
 
-      setDate(formattedDate);
+      dateSetter(formattedDate);
     }
     setShowDatePicker(false);
+  };
+
+  // Helper workaround to avoid variable naming conflicts
+  const dateSetter = (val: string) => {
+    setDate(val);
   };
 
   const handleAddParticipant = () => {
@@ -100,38 +107,86 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
     }
   };
 
-  const handleFormSubmission = () => {
-    const finalName = name.trim() || 'Mesyuarat Cadangan Projek Seminit';
+  // Updated submission logic mapping to your live Laravel database
+  const handleFormSubmission = async () => {
+    const finalName = name.trim();
+    if (!finalName) {
+      if (Platform.OS === 'web') {
+        alert('Sila masukkan nama mesyuarat');
+      } else {
+        Alert.alert('Ralat', 'Sila masukkan nama mesyuarat');
+      }
+      return;
+    }
+
     const finalDate = date || new Date().toISOString().split('T')[0];
     const finalLocation = location.trim() || 'Bilik Mesyuarat Utama, Aras 3';
 
-    // Mencantumkan pecahan nilai masa menjadi format standard "HH:MM AM/PM"
+    // Menukar input jam 12-jam (AM/PM) kepada format 24-jam "HH:MM:SS"
+    // yang diperlukan oleh lajur TIME dalam MySQL (mengelakkan ralat SQLSTATE[22007])
+    const to24HourTime = (hourStr: string, minuteStr: string, period: 'AM' | 'PM') => {
+      let hour = parseInt(hourStr, 10) % 12;
+      if (period === 'PM') hour += 12;
+      return `${hour.toString().padStart(2, '0')}:${minuteStr.padStart(2, '0')}:00`;
+    };
+
     const formattedStart = startHour && startMinute 
-      ? `${startHour.padStart(2, '0')}:${startMinute.padStart(2, '0')} ${startPeriod}`
-      : '09:30 AM';
+      ? to24HourTime(startHour, startMinute, startPeriod)
+      : '09:30:00';
 
     const formattedEnd = endHour && endMinute 
-      ? `${endHour.padStart(2, '0')}:${endMinute.padStart(2, '0')} ${endPeriod}`
-      : '11:00 AM';
+      ? to24HourTime(endHour, endMinute, endPeriod)
+      : '11:00:00';
 
     const participantsString = participantList.length > 0 
       ? participantList.join(', ') 
       : 'Hafiz, Farish, Jeremy, Hurin';
 
-    const constructedPayload: Meeting = {
-      id: Date.now().toString(),
+    const agendaString = agendaList.length > 0 
+      ? agendaList.join('\n') 
+      : null;
+
+    // Structuring database object key names exactly matching Laravel request validation Rules
+    const payload = {
       name: finalName,
       location: finalLocation,
-      participants: participantsString,
       date: finalDate,
-      startTime: formattedStart,
-      endTime: formattedEnd,
-      status: 'Pending Audio',
-      transcript: '', 
-      summary: '',    
+      start_time: formattedStart,
+      end_time: formattedEnd,
+      participants: participantsString,
+      agenda: agendaString,
     };
 
-    onSaveMeeting(constructedPayload);
+    try {
+      const response = await fetch(API_ENDPOINTS.createMeeting, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Pass the live database model (complete with actual MySQL ID) up to the App state container
+        onSaveMeeting(result.meeting);
+      } else {
+        if (Platform.OS === 'web') {
+          alert('Gagal menyimpan: ' + (result.message || 'Ralat pelayan'));
+        } else {
+          Alert.alert('Ralat', 'Gagal menyimpan: ' + (result.message || 'Ralat pelayan'));
+        }
+      }
+    } catch (error) {
+      console.error('Network failure connecting to Laravel:', error);
+      if (Platform.OS === 'web') {
+        alert('Ralat Rangkaian. Sila pastikan pelayan backend Laravel anda sedang aktif via php artisan serve.');
+      } else {
+        Alert.alert('Ralat Rangkaian', 'Sila pastikan pelayan backend Laravel anda sedang aktif.');
+      }
+    }
   };
 
   return (
@@ -174,7 +229,7 @@ export const CreateMeetingScreen: React.FC<CreateMeetingScreenProps> = ({
                     <input
                       type="date"
                       value={date}
-                      onChange={(e: any) => setDate(e.target.value)}
+                      onChange={(e: any) => dateSetter(e.target.value)}
                       className="h-12 px-4 border border-slate-300 rounded-xl bg-white w-full text-slate-900 text-sm focus:outline-none"
                     />
                   ) : (
