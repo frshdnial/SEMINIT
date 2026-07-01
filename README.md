@@ -21,6 +21,12 @@ Developed by **All Day Project**, Section 02, Universiti Teknologi Malaysia, usi
 
 ---
 
+##  Vision
+
+Beyond solving Kulai District Council's immediate administrative bottleneck, Seminit is positioned as a small step toward **Johor's Vision 2030** goal of becoming a regional AI and data hub — demonstrating how AI can reduce human error and administrative overhead in everyday public-sector workflows.
+
+---
+
 ##  Features
 
 | Subsystem (per proposal) | What it does | Status |
@@ -69,7 +75,7 @@ Developed by **All Day Project**, Section 02, Universiti Teknologi Malaysia, usi
 - **Database**: **MySQL**, storing meeting metadata (name, date, time, participants, agenda, status) plus the transcript/summary text once generated.
 - **File storage**: Uploaded audio files are stored on Laravel's local `public` disk (`storage/app/public/meeting_audio`) and served via the `storage:link` symlink.
 
-### Original proposed architecture (per the FYP proposal)
+### Original proposed architecture 
 
 The proposal envisioned a more elaborate stack for the AI layer specifically, which this codebase does not yet integrate:
 
@@ -228,8 +234,3 @@ This opens the app at `http://localhost:8081`. You can also run `npx expo start`
 | `Validation rule ... requires at least 1 parameters` | A Laravel validation rule is malformed (e.g. `max|255` instead of `max:255`) — check `MeetingController.php`. |
 | CORS errors calling the API from the browser | Confirm the backend is running and `BASE_URL` in `src/config/api.ts` matches its host/port exactly. |
 
----
-
-##  Vision
-
-Beyond solving Kulai District Council's immediate administrative bottleneck, Seminit is positioned as a small step toward **Johor's Vision 2030** goal of becoming a regional AI and data hub — demonstrating how AI can reduce human error and administrative overhead in everyday public-sector workflows.
