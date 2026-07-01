@@ -41,7 +41,7 @@ export const MeetingListItem: React.FC<MeetingListItemProps> = ({
 
       {/* Date & Time */}
       <Text className="text-slate-600 text-sm mb-1.5">
-        📅 {meeting.date} | ⏰ {meeting.startTime} - {meeting.endTime}
+        📅 {meeting.date} | ⏰ {meeting.start_time} - {meeting.end_time}
       </Text>
 
       {/* Participants */}
