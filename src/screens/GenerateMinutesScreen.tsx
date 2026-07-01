@@ -79,7 +79,7 @@ export const GenerateMinutesScreen: React.FC<GenerateMinutesScreenProps> = ({
             {/* Metadata Footer */}
             <View className="bg-slate-50 border-t border-slate-100 p-4 px-6">
               <Text className="text-xxs text-slate-400 uppercase tracking-wider">
-                Maklumat: {meeting.date} ({meeting.startTime} - {meeting.endTime}) | Lokasi: {meeting.location}
+                Maklumat: {meeting.date} ({meeting.start_time} - {meeting.end_time}) | Lokasi: {meeting.location}
               </Text>
             </View>
           </Panel>
