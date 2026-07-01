@@ -23,7 +23,7 @@ Developed by **All Day Project**, Section 02, Universiti Teknologi Malaysia, usi
 
 ##  Vision
 
-Beyond solving Kulai District Council's immediate administrative bottleneck, Seminit is positioned as a small step toward **Johor's Vision 2030** goal of becoming a regional AI and data hub — demonstrating how AI can reduce human error and administrative overhead in everyday public-sector workflows.
+Beyond solving Kulai District Office's immediate administrative bottleneck, Seminit is positioned as a small step toward **Johor's Vision 2030** goal of becoming a regional AI and data hub — demonstrating how AI can reduce human error and administrative overhead in everyday public-sector workflows.
 
 ---
 
