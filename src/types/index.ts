@@ -6,10 +6,13 @@ export interface Meeting {
   participants: string;
 
   date: string;
-  startTime: string;
-  endTime: string;
+  start_time: string;
+  end_time: string;
 
   status: string;
+
+  audio_path?: string | null;
+  audio_url?: string | null;
 
   transcript?: string;
   summary?: string;

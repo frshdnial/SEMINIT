@@ -1,5 +1,6 @@
+import { API_ENDPOINTS } from '@/config/api'; // Added backend endpoints mapping configurations
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import "./global.css";
 
@@ -9,11 +10,10 @@ import { DashboardScreen } from '@/screens/DashboardScreen';
 import { FormatMinutesScreen } from '@/screens/FormatMinutesScreen';
 import { GenerateMinutesScreen } from '@/screens/GenerateMinutesScreen';
 import { MeetingListScreen } from '@/screens/MeetingListScreen';
-import { MinutesProductionScreen } from '@/screens/MinutesProductionScreen'; // 👈 1. Import new file
+import { MinutesProductionScreen } from '@/screens/MinutesProductionScreen';
 import { ViewMinutesScreen } from '@/screens/ViewMinutesScreen';
 import { Meeting } from '@/types';
 
-// 👈 2. Add 'PRODUCTION' into the configuration state
 type ScreenState = 'DASHBOARD' | 'CREATE' | 'UPLOAD' | 'GENERATE' | 'FORMAT' | 'PRODUCTION' | 'MINUTES' | 'LIST';
 
 export default function App() {
@@ -21,68 +21,124 @@ export default function App() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [activeSelectedMeeting, setActiveSelectedMeeting] = useState<Meeting | null>(null);
 
+  // Helper function to query the Laravel database backend
+  const refreshMeetingsFromDatabase = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.getMeetings);
+      if (response.ok) {
+        const data = await response.json();
+        setMeetings(data);
+      } else {
+        console.warn('Gagal membaca data dari pangkalan data');
+      }
+    } catch (error) {
+      console.error('Ralat ketika memanggil backend Laravel:', error);
+    }
+  };
+
+  // Run the database fetch pipeline on initial layout initialization
+  useEffect(() => {
+    refreshMeetingsFromDatabase();
+  }, []);
+
   const handleCreateMeetingComplete = (newMeeting: Meeting) => {
+    // Sync UI array list dynamically by appending the newly registered row from MySQL
     setMeetings([newMeeting, ...meetings]);
     setActiveSelectedMeeting(newMeeting);
     setCurrentScreen('UPLOAD');
   };
 
-  const handleAudioProcessingComplete = (id: string, transcript: string, summary: string) => {
-    const finalizedObject: Meeting = {
-      id,
-      name: activeSelectedMeeting?.name || 'Mesyuarat Seminit',
-      location: activeSelectedMeeting?.location || 'Bilik Mesyuarat Utama',
-      date: activeSelectedMeeting?.date || new Date().toISOString().split('T')[0],
-      startTime: activeSelectedMeeting?.startTime || '09:00',
-      endTime: activeSelectedMeeting?.endTime || '10:00',
-      participants: activeSelectedMeeting?.participants || '',
-      status: 'Completed' as const,
-      transcript,
-      summary
-    };
+  const handleAudioProcessingComplete = (id: string | number, transcript: string, summary: string) => {
+    // Sync the local meetings state arrays immediately to avoid stale rows in dashboard rendering
+    setMeetings(prevMeetings => 
+      prevMeetings.map(m => 
+        m.id.toString() === id.toString()
+          ? { ...m, transcript, summary, status: 'Completed' }
+          : m
+      )
+    );
 
-    setMeetings((prev) => prev.map((item) => (item.id === id ? finalizedObject : item)));
-    setActiveSelectedMeeting(finalizedObject);
+    // Ensure the targeted focused meeting pointer is synced too before moving screens
+    if (activeSelectedMeeting && activeSelectedMeeting.id.toString() === id.toString()) {
+      setActiveSelectedMeeting({
+        ...activeSelectedMeeting,
+        transcript,
+        summary,
+        status: 'Completed'
+      });
+    }
+
     setCurrentScreen('GENERATE');
   };
 
-  const handleFinalizedMinutesSaving = (finalSummary: string) => {
+  const handleFinalizedMinutesSaving = async (finalSummary: string) => {
     if (!activeSelectedMeeting) return;
 
-    const lockedMeeting: Meeting = {
-      ...activeSelectedMeeting,
-      summary: finalSummary,
-    };
+    try {
+      // Persist the updated, edited markdown contents back into MySQL rows
+      const response = await fetch(API_ENDPOINTS.updateMeetingNlp(activeSelectedMeeting.id), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          transcript: activeSelectedMeeting.transcript,
+          summary: finalSummary,
+          status: 'Completed'
+        }),
+      });
 
-    setMeetings((prev) =>
-      prev.map((item) => (item.id === lockedMeeting.id ? lockedMeeting : item))
-    );
-    setActiveSelectedMeeting(lockedMeeting);
-    
-    // Redirect cleanly back to Dashboard
-    setCurrentScreen('DASHBOARD');
+      if (response.ok) {
+        // Update local components view configurations
+        setMeetings(prevMeetings =>
+          prevMeetings.map(m =>
+            m.id.toString() === activeSelectedMeeting.id.toString()
+              ? { ...m, summary: finalSummary, status: 'Completed' }
+              : m
+          )
+        );
+
+        setActiveSelectedMeeting({
+          ...activeSelectedMeeting,
+          summary: finalSummary,
+          status: 'Completed'
+        });
+
+        setCurrentScreen('PRODUCTION');
+      } else {
+        alert('Gagal mengemaskini draf minit dalam pangkalan data.');
+      }
+    } catch (error) {
+      console.error('Error saving updated summary text:', error);
+      alert('Ralat sambungan rangkaian ke pelayan.');
+    }
   };
 
-  const handleSelectMeetingEntry = (meeting: Meeting) => {
+  // Selecting a meeting from the Dashboard or Meeting List (Senarai Mesyuarat):
+  // 'Pending Audio' meetings still need a recording, so jump back into the
+  // upload workflow. Anything else is treated as finished and goes straight
+  // to the final minutes production/document view.
+  const handleSelectMeetingFromList = (meeting: Meeting) => {
     setActiveSelectedMeeting(meeting);
-    if (meeting.status === 'Completed') {
-      // 👈 3. Route finished documents directly into the brand new production styling layout
-      setCurrentScreen('PRODUCTION'); 
-    } else {
+
+    if (meeting.status === 'Pending Audio') {
       setCurrentScreen('UPLOAD');
+    } else {
+      setCurrentScreen('PRODUCTION');
     }
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <StatusBar style="dark" />
+    <View className="flex-1 bg-slate-100">
+      <StatusBar style="auto" />
 
       {currentScreen === 'DASHBOARD' && (
         <DashboardScreen
           meetings={meetings}
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
           onNavigateToList={() => setCurrentScreen('LIST')}
-          onSelectMeeting={handleSelectMeetingEntry}
+          onSelectMeeting={handleSelectMeetingFromList}
         />
       )}
 
@@ -100,6 +156,9 @@ export default function App() {
           meeting={activeSelectedMeeting}
           onAudioProcessed={handleAudioProcessingComplete}
           onBack={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToList={() => setCurrentScreen('LIST')}
+          onNavigateToSetup={() => setCurrentScreen('CREATE')}
         />
       )}
 
@@ -108,6 +167,9 @@ export default function App() {
           meeting={activeSelectedMeeting}
           onSaveAndClose={() => setCurrentScreen('FORMAT')}
           onBack={() => setCurrentScreen('UPLOAD')}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToList={() => setCurrentScreen('LIST')}
+          onNavigateToSetup={() => setCurrentScreen('CREATE')}
         />
       )}
 
@@ -116,21 +178,32 @@ export default function App() {
           meeting={activeSelectedMeeting}
           onSaveAndConfirm={handleFinalizedMinutesSaving}
           onBack={() => setCurrentScreen('GENERATE')}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToList={() => setCurrentScreen('LIST')}
+          onNavigateToSetup={() => setCurrentScreen('CREATE')}
         />
       )}
 
-      {/* 👈 4. Mount and bind the new custom Production Screen View */}
       {currentScreen === 'PRODUCTION' && activeSelectedMeeting && (
         <MinutesProductionScreen
           meeting={activeSelectedMeeting}
-          onBack={() => setCurrentScreen('DASHBOARD')}
+          onBack={() => {
+            refreshMeetingsFromDatabase(); // Refresh layout states on redirect
+            setCurrentScreen('DASHBOARD');
+          }}
+          onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
+          onNavigateToList={() => setCurrentScreen('LIST')}
+          onNavigateToSetup={() => setCurrentScreen('CREATE')}
         />
       )}
 
       {currentScreen === 'MINUTES' && activeSelectedMeeting && (
         <ViewMinutesScreen
           meeting={activeSelectedMeeting}
-          onBack={() => setCurrentScreen('DASHBOARD')}
+          onBack={() => {
+            refreshMeetingsFromDatabase();
+            setCurrentScreen('DASHBOARD');
+          }}
         />
       )}
 
@@ -141,7 +214,7 @@ export default function App() {
           onNavigateToSetup={() => setCurrentScreen('CREATE')}
           NavigateToViewMeetings={() => setCurrentScreen('LIST')}
           onNavigateToDashboard={() => setCurrentScreen('DASHBOARD')}
-          onSelectMeeting={handleSelectMeetingEntry}
+          onSelectMeeting={handleSelectMeetingFromList}
         />
       )}
     </View>
