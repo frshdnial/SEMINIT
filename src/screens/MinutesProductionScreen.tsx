@@ -62,7 +62,7 @@ export const MinutesProductionScreen: React.FC<MinutesProductionScreenProps> = (
               </View>
               <View className="flex-row border-b border-slate-300">
                 <View className="w-1/4 p-3 border-r border-slate-300 bg-slate-100"><Text className="font-bold text-xs text-slate-700">Masa</Text></View>
-                <View className="w-3/4 p-3"><Text className="text-xs text-slate-900">{meeting.startTime} - {meeting.endTime}</Text></View>
+                <View className="w-3/4 p-3"><Text className="text-xs text-slate-900">{meeting.start_time} - {meeting.end_time}</Text></View>
               </View>
               <View className="flex-row border-b border-slate-300 bg-slate-50">
                 <View className="w-1/4 p-3 border-r border-slate-300 bg-slate-100"><Text className="font-bold text-xs text-slate-700">Tempat</Text></View>
