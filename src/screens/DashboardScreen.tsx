@@ -94,14 +94,18 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                   </Text>
                 </View>
               ) : (
-                <FlatList
-                  data={meetings}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <MeetingListItem meeting={item} onPress={() => onSelectMeeting(item)} />
-                  )}
-                  showsVerticalScrollIndicator={false}
-                />
+                <View className="max-h-[420px]">
+                  <FlatList
+                    data={meetings}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                      <MeetingListItem meeting={item} onPress={() => onSelectMeeting(item)} />
+                    )}
+                    showsVerticalScrollIndicator={false}
+                    style={{ maxHeight: 420 }}
+                    nestedScrollEnabled
+                  />
+                </View>
               )}
             </View>
 
