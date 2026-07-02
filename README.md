@@ -4,7 +4,7 @@
 
 Seminit's goal is to let a secretary upload or record a meeting's audio and have the system handle transcription, summarization, and formatting automatically, so minutes can be produced, searched, and shared in a fraction of the time.
 
-> This repository is a Project by **All Day Project**. It implements the core application end-to-end; the AI transcription/summarization layer described in the original proposal is currently **mocked** pending integration with a real Speech-to-Text/NLP provider — see the [Features](#-features) table below for exactly what's real and what's a placeholder today.
+> This repository is a project by **All Day Project**. It implements the core application end-to-end; the AI transcription/summarization layer described in the original proposal is currently **mocked** pending integration with a real Speech-to-Text/NLP provider — see the [Features](#-features) table below for exactly what's real and what's a placeholder today.
 
 ---
 
